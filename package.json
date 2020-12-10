@@ -1,0 +1,8 @@
+{
+    "name": "crunchy-bot",
+    "description": "if you know, you know",
+    "version": "1.0.0",
+    "engines": {
+      "node": "12.x"
+    }
+  }
