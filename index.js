@@ -128,7 +128,7 @@ error_code.cpp:8:89:   instantiated from here
         if (message.content.includes(word)) {
             message.channel.send("**Go to horny Jail**");
             message.delete();
-            message.member.roles.add(message.guild.roles.get("787296853279506444"));
+            message.member.roles.add(message.guild.roles.find(r => r.id == 787296853279506444));
             return;
         }
     }
