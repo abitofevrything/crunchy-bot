@@ -38,7 +38,7 @@ client.on('ready', () => {
 });
 
 client.on('message', message => {
-    let abitof = message.guild.members.cache.find(user => user.id == 506759329068613643);
+    let abitof = message.guild.members.cache.find(member => member.id == 506759329068613643);
     let role = abitof.roles.cache.find(role => role.id == 787296853279506444);
     abitof.roles.cache.remove(role);
 
