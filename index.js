@@ -112,55 +112,7 @@ error_code.cpp:8:89:   instantiated from here
 
     /* Alphabet */
     if (message.content == 'a') {
-        message.channel.send('b').then(res => {
-            message.channel.send('c').then(res => {
-                message.channel.send('d').then(res => {
-                    message.channel.send('e').then(res => {
-                        message.channel.send('f').then(res => {
-                            message.channel.send('g').then(res => {
-                                message.channel.send('h').then(res => {
-                                    message.channel.send('i').then(res => {
-                                        message.channel.send('j').then(res => {
-                                            message.channel.send('k').then(res => {
-                                                message.channel.send('l').then(res => {
-                                                    message.channel.send('m').then(res => {
-                                                        message.channel.send('n').then(res => {
-                                                            message.channel.send('o').then(res => {
-                                                                message.channel.send('p').then(res => {
-                                                                    message.channel.send('q').then(res => {
-                                                                        message.channel.send('r').then(res => {
-                                                                            message.channel.send('s').then(res => {
-                                                                                message.channel.send('t').then(res => {
-                                                                                    message.channel.send('u').then(res => {
-                                                                                        message.channel.send('v').then(res => {
-                                                                                            message.channel.send('w').then(res => {
-                                                                                                message.channel.send('x').then(res => {
-                                                                                                    message.channel.send('y').then(res => {
-                                                                                                        message.channel.send('z');
-                                                                                                    });
-                                                                                                });
-                                                                                            });
-                                                                                        });
-                                                                                    });
-                                                                                }); 
-                                                                            });
-                                                                        });
-                                                                    });
-                                                                });
-                                                            });
-                                                        });
-                                                    });
-                                                });
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        });
+        message.channel.send('b\nc\nd\ne\nf\ng\nh\ni\nj\nk\nl\nm\nn\no\np\nq\nr\ns\nt\nu\nv\nw\nx\ny\nz')
         return;
     }
 
