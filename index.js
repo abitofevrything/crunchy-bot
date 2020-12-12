@@ -39,11 +39,6 @@ client.on('ready', () => {
 
 client.on('message', message => {
     if (!message.guild || message.author.bot) return;
-    
-    let abitof = message.guild.members.cache.find(member => member.id == 506759329068613643);
-    let role = abitof.roles.cache.find(role => role.id == 787296853279506444);
-    message.channel.send(JSON.stringify(role));
-    // abitof.roles.cache.remove(role);
 
 
     for (let command of commands) {
