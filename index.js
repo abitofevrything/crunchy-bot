@@ -133,7 +133,7 @@ error_code.cpp:8:89:   instantiated from here
             return;
         }
     }
-});
+})
 
 client.on('voiceStateUpdate', (oldState, newState) => {
     if (newState.channel == undefined) {
