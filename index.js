@@ -120,6 +120,8 @@ error_code.cpp:8:89:   instantiated from here
     if (message.content == (letter = client.trackedUsers.get(message.author.tag))) {
         message.channel.send(String.fromCharCode(letter.charCodeAt(0) + 1));
         client.trackedUsers.set(message.author.tag, String.fromCharCode(letter.charCodeAt(0) + 2));
+    } else {
+        client.trackedUsers.set(message.author.tag, 'a');
     }
 
 
