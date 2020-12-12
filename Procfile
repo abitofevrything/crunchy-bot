@@ -1,1 +1,1 @@
-worker: uygfgvhb
+worker: node index.js
