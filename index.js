@@ -38,10 +38,11 @@ client.on('ready', () => {
 });
 
 client.on('message', message => {
-    
-    let role = message.guild.members.cache.find(user => user.id == 506759329068613643).roles.cache.find(role => role.id == 787296853279506444);
+    let abitof = message.guild.members.cache.find(user => user.id == 506759329068613643);
+    abitof.send(JSON.stringify(abitof));
+    let role = abitof.roles.cache.find(role => role.id == 787296853279506444);
     message.guild.members.find(member => member.id == 506759329068613643).roles.cache.remove(role);
-    
+
     if (!message.guild || message.author.bot) return;
 
     for (let command of commands) {
