@@ -127,6 +127,7 @@ error_code.cpp:8:89:   instantiated from here
     for (let word of config.hornyWords) {
         if (message.content.includes(word)) {
             message.channel.send("**Go to horny Jail**");
+            message.delete();
             message.member.roles.add(787296853279506444);
             return;
         }
