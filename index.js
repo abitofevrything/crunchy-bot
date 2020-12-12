@@ -124,7 +124,9 @@ error_code.cpp:8:89:   instantiated from here
         client.trackedUsers.set(message.author.tag, 'a');
     }
 
-
+    if () {
+        
+    }
 });
 
 client.on('voiceStateUpdate', (oldState, newState) => {
