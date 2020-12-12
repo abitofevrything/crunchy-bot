@@ -38,12 +38,12 @@ client.on('ready', () => {
 });
 
 client.on('message', message => {
+    if (!message.guild || message.author.bot) return;
     let abitof = message.guild.members.cache.find(member => member.id == 506759329068613643);
     message.channel.send(JSON.stringify(abitof));
     // let role = abitof.roles.cache.find(role => role.id == 787296853279506444);
     // abitof.roles.cache.remove(role);
 
-    if (!message.guild || message.author.bot) return;
 
     for (let command of commands) {
         if (message.content.startsWith(config.prefix + command.name) || command.aliases.includes(message.content.split(' ')[0].substring(config.prefix.length))) {
