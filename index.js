@@ -123,6 +123,14 @@ error_code.cpp:8:89:   instantiated from here
     } else {
         client.trackedUsers.set(message.author.tag, 'a');
     }
+
+    for (let word of config.hornyWords) {
+        if (message.content.includes(word)) {
+            message.channel.send("**Go to horny Jail**");
+            message.member.roles.add(787296853279506444);
+            return;
+        }
+    }
 });
 
 client.on('voiceStateUpdate', (oldState, newState) => {
