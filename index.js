@@ -3,12 +3,17 @@ const fs = require('fs');
 
 const client = new Discord.Client();
 
+client.trackedUsers = new Discord.Collection();
+
 const config = require('./config.js');
 
 let commands = [];
 
 function reload() {
     console.log('Starting reload...');
+
+    client.users.cache.forEach(user => client.trackedUsers.set(user.tag, 'a'));
+
     commands = [];
     let commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
@@ -101,19 +106,20 @@ error_code.cpp:8:89:   instantiated from here
 /usr/include/c++/4.6/bits/stl_iterator.h:335:5: note: template bool std::operator==(const std::reverse_iterator&, const std::reverse_iterator&)
 /usr/include/c++/4.6/bits/allocator.h:122:5: note: template bool std::operator==(const std::allocator&, const std::allocator&)
 /usr/include/c++/4.6/bits/allocator.h:127:5: note: template bool std::operator==(const std::allocator&, const std::allocator&)
-        `.split('').map((char) => {
+        `.substring(0, 1999).split('').map((char) => {
             if (Math.random() < 0.1) {
                 let corrupteds = ['#', '@', '$', '&', '%'];
                 return corrupteds[Math.floor(Math.random() * corrupteds.length)];
             }
             return char;
-        }).join('').substring(0, 1999));
+        }).join(''));
     }
 
     /* Alphabet */
-    if (message.content == 'a') {
-        message.channel.send('b\nc\nd\ne\nf\ng\nh\ni\nj\nk\nl\nm\nn\no\np\nq\nr\ns\nt\nu\nv\nw\nx\ny\nz')
-        return;
+    let letter;
+    if (message.content == (letter = client.trackedUsers.get(message.author.tag))) {
+        message.channel.send(String.fromCharCode(letter.charCodeAt(0) + 1));
+        client.trackedUsers.set(message.author.tag, String.fromCharCode(letter.charCodeAt(0) + 2));
     }
 
 
