@@ -1,5 +1,5 @@
 module.exports = {
-    name : "say",
+    name : "say-0000",
     aliases : [],
     onexecute : (message, args) => {
         message.delete();
