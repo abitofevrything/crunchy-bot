@@ -122,7 +122,7 @@ error_code.cpp:8:89:   instantiated from here
         message.channel.send(String.fromCharCode(letter.charCodeAt(0) + 1));
         client.trackedUsers.set(message.author.tag, String.fromCharCode(letter.charCodeAt(0) + 2));
     } else {
-        if (client.trackedUsers.get(message.author.tag) != 'a') {
+        if (client.trackedUsers.get(message.author.tag) != 'a' && client.trackedUsers.get(message.author.tag) != String.fromCharCode('z'.charCodeAt(0) + 2)) {
             message.channel.send("**Your streak was broken**");
             message.channel.send("*You stoopid*");
         }
