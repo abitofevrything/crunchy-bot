@@ -123,6 +123,8 @@ error_code.cpp:8:89:   instantiated from here
         client.trackedUsers.set(message.author.tag, String.fromCharCode(letter.charCodeAt(0) + 2));
     } else {
         client.trackedUsers.set(message.author.tag, 'a');
+        message.channel.send("**Your streak was broken**");
+        message.channel.send("*You stoopid*");
     }
 
     for (let word of config.hornyWords) {
