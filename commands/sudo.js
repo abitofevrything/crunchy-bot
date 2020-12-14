@@ -9,7 +9,7 @@ module.exports = {
             return;
         }
 
-        let sudoMember = message.mentions.first() || message.guild.members.cache.get(args[0]);
+        let sudoMember = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
         if (sudoMember == undefined) {
             message.channel.send("Unable to find user " + args[0]);
             return;
