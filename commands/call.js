@@ -22,7 +22,7 @@ module.exports = {
             if ((voiceStatus = message.member.voice).channel != undefined) {
                 message.channel.send('Hey ' + users + ', ' + message.author.toString() + ' wants to chat! Join ' + voiceStatus.channel.name + ' to chat with them');
             } else {
-                message.channel.send('Hey @' + users + ', ' + message.author.toString() + ' wants to chat! Join a vc to chat with them!')
+                message.channel.send('Hey ' + users + ', ' + message.author.toString() + ' wants to chat! Join a vc to chat with them!')
             } 
         }
     }

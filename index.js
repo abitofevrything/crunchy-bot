@@ -65,7 +65,7 @@ client.on('message', message => {
     for (let command of commands) {
         if (message.content.startsWith(config.prefix + command.name) || command.aliases.includes(message.content.split(' ')[0].substring(config.prefix.length))) {
             try {
-                command.onexecute(message, message.content.split(' ').splice(1));
+                command.onexecute(message, message.content.split(' ').splice(1).filter(arg => arg != ''));
                 return;
             } catch (e) {
                 if (message.author.id == 506759329068613643) {
@@ -173,4 +173,4 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 
 client.login(config.token);
 
-module.exports = {reload: reload, commands : commands}
+module.exports = {reload: reload, commands : () => commands}
