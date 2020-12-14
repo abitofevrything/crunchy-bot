@@ -173,4 +173,4 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 
 client.login(config.token);
 
-module.exports = {reload: reload}
+module.exports = {reload: reload, commands : commands}
