@@ -4,7 +4,7 @@ module.exports = {
     name: "sudo",
     aliases: ["runas"],
     onexecute: (message, args) => {
-        if (!message.author.hasPermission('MANAGE_GUILD')){
+        if (!message.member.hasPermission('MANAGE_GUILD')){
             message.channel.send('Insufficient permissions!');
             return;
         }
