@@ -11,7 +11,7 @@ module.exports = {
 
         let sudoMember = message.guild.members.cache.find(member => member.toString() == args[0]);
         if (sudoMember == undefined) {
-            message.channel.send("Unable to find user [test]" + args[0]);
+            message.channel.send("Unable to find user " + args[0]);
             return;
         }
 
