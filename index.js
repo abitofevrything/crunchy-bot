@@ -14,7 +14,6 @@ function reload() {
 
     client.users.cache.forEach(user => client.trackedUsers.set(user.tag, 'a'));
 
-
     commands = [];
     let commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
@@ -140,7 +139,7 @@ error_code.cpp:8:89:   instantiated from here
 
     /* Alphabet */
     let letter;
-    if (message.content == (letter = client.trackedUsers.get(message.author.tag))) {
+    if (message.content.toLowerCase() == (letter = client.trackedUsers.get(message.author.tag))) {
         message.channel.send(String.fromCharCode(letter.charCodeAt(0) + 1));
         client.trackedUsers.set(message.author.tag, String.fromCharCode(letter.charCodeAt(0) + 2));
     } else {
