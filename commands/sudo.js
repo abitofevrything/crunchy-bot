@@ -16,8 +16,7 @@ module.exports = {
         }
 
         let sudoCommand = args[1].substring(1);
-        let sudoArgs = args.slice(2);
-
+        let sudoArgs = args.slice(2); 
         /* Create a fake message  and copy over all relevant values*/
         let sudoMsg = {};
 
@@ -31,6 +30,29 @@ module.exports = {
         sudoMsg.member = sudoMember;
         sudoMsg.content = require('../config.js').prefix + sudoCommand + sudoArgs.join(' ');
         sudoMsg.mentions = message.mentions;
+
+        sudoMsg.awaitReactions = message.awaitReactions;
+        sudoMsg.createReactionCollector = message.createReactionCollector;
+        sudoMsg.crosspost = message.crosspost;
+        sudoMsg.delete = () => {
+            message.channel.send('[LOG] -> Deleted SUDO message (no real effect)');
+        }
+        sudoMsg.edit = () => {
+            message.channel.send('[LOG] -> Edited SUDO message (no real effect)')
+        }
+        sudoMsg.equals = message.equals;
+        sudoMsg.fetch = message.fetch;
+        sudoMsg.fetchWebhook = message.fetchWebhook;
+        sudoMsg.pin = message.pin;
+        sudoMsg.react = message.react;
+        sudoMsg.reply = message.reply;
+        sudoMsg.suppressEmbeds = () => {
+            message.channel.send('[LOG] -> Removed Embeds from SUDO message (no real effect)');
+        }
+        sudoMsg.toString = () => {
+            return require('../config.js').prefix + sudoCommand + ' ' + sudoArgs.join(' ');
+        }
+        sudoMsg.unpin = message.unpin;
 
         for (let command of commands()) {
             if (command.name == sudoCommand || command.aliases.includes(sudoCommand)) {
