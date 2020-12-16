@@ -9,6 +9,8 @@ const config = require('./config.js');
 
 let commands = [];
 
+let autoCallEnabled = true;
+
 function reload() {
     console.log('Starting reload...');
 
@@ -167,10 +169,11 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     if (newState.channel.members.size != 1) {
         return;
     }
-
-    client.channels.cache.find(channel => channel.id == 786639730133303357).send('Hey @here, ' + newState.member.toString() + " just joined a voice channel! Join " + newState.channel.name + " to chat with them!");
+    if (autoCallEnabled) {
+        client.channels.cache.find(channel => channel.id == 786639730133303357).send('Hey @here, ' + newState.member.toString() + " just joined a voice channel! Join " + newState.channel.name + " to chat with them!");
+    }
 });
 
 client.login(config.token);
 
-module.exports = {reload: reload, commands : () => commands}
+module.exports = {reload: reload, commands : () => commands, setAutoCall : (bool) => {autoCallEnabled = bool}}
