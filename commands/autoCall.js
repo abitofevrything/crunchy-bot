@@ -9,5 +9,6 @@ module.exports = {
             return;
         }
         setAutoCall(args[0]);
+        message.channel.send('Set autoCall status to ' + args[0]);
     }
 }
