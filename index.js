@@ -176,4 +176,4 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 
 client.login(config.token);
 
-module.exports = {reload: reload, commands : () => commands, setAutoCall : (bool) => {autoCallEnabled = bool}}
+module.exports = {reload: reload, commands : () => commands, setAutoCall : (bool) => {autoCallEnabled = bool == "on" | "true" | "1"}}
