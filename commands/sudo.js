@@ -1,4 +1,5 @@
 const {commands} = require('../index.js');
+const {prefix} = require('../config');
 
 module.exports = {
     name: "sudo",
@@ -28,7 +29,7 @@ module.exports = {
 
         sudoMsg.author = sudoMember.user;
         sudoMsg.member = sudoMember;
-        sudoMsg.content = require('../config.js').prefix + sudoCommand + sudoArgs.join(' ');
+        sudoMsg.content = prefix + sudoCommand + sudoArgs.join(' ');
         sudoMsg.mentions = message.mentions;
 
         sudoMsg.awaitReactions = message.awaitReactions;
@@ -50,7 +51,7 @@ module.exports = {
             message.channel.send('[LOG] -> Removed Embeds from SUDO message (no real effect)');
         }
         sudoMsg.toString = () => {
-            return require('../config.js').prefix + sudoCommand + ' ' + sudoArgs.join(' ');
+            return prefix + sudoCommand + ' ' + sudoArgs.join(' ');
         }
         sudoMsg.unpin = message.unpin;
 
