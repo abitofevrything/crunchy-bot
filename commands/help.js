@@ -7,9 +7,7 @@ module.exports = {
     aliases: [],
     onexecute : (message, args) => {
         let embed = new MessageEmbed().setTitle('Help');
-        embed.addField('Commands', '```' + commands().reduce((acc, curr, index, arr) => acc + prefix + curr.name + (index == arr.length - 1 ? '' : '\n')) + '```');
-
-
-        message.channel.send(embed);
+        embed.addField('Commands', '```' + commands().reduce((acc, curr, index, arr) => (acc == undefined ? '' : acc) + prefix + curr.name + (index == arr.length - 1 ? '' : '\n')) + '```');
+         message.channel.send(embed);
     }
 }
