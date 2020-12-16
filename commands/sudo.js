@@ -4,6 +4,11 @@ const {prefix} = require('../config');
 module.exports = {
     name: "sudo",
     aliases: ["runas"],
+    help : {
+        desc : 'Executes a command as a user',
+        syntax : 'sudo (@user) (command)',
+        perms : 'MANAGE_GUILD (admin)'
+    },
     onexecute: (message, args) => {
         if (!message.member.hasPermission('MANAGE_GUILD')){
             message.channel.send('Insufficient permissions!');

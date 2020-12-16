@@ -65,7 +65,7 @@ client.on('message', message => {
 
 
     for (let command of commands) {
-        if (message.content.startsWith(config.prefix + command.name) || command.aliases.includes(message.content.split(' ')[0].substring(config.prefix.length))) {
+        if (message.content.startsWith(config.prefix + command.name) || (command.aliases ? command.aliases.includes(message.content.split(' ')[0].substring(config.prefix.length)): false)) {
             try {
                 command.onexecute(message, message.content.split(' ').splice(1).filter(arg => arg != ''));
                 return;

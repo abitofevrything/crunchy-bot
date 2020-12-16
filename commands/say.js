@@ -1,6 +1,9 @@
 module.exports = {
     name : "say",
-    aliases : [],
+    help : {
+        desc : 'Makes the bot say a message',
+        syntax : '#%& $5£&# ~@(*"! ]£'
+    },
     onexecute : (message, args) => {
         function intFromBytes(x){
             let val = 0;

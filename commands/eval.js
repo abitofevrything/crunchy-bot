@@ -3,6 +3,11 @@ const { MessageEmbed } = require("discord.js");
 module.exports = {
     name : 'eval',
     aliases : ['ev'],
+    help : {
+        desc : 'Evaluates a javascript expression',
+        syntax : 'eval (expression)',
+        perms : 'MANAGE_GUILD (admin)'
+    },
     onexecute : (message, args) => {
         if (!message.member.hasPermission('MANAGE_GUILD')) {
             message.channel.send('Insufficient permissions!');

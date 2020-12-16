@@ -1,8 +1,11 @@
 const {setAutoCall} = require('../index.js');
-
 module.exports = {
     name : "autoCall",
-    aliases : [],
+    help : {
+        desc : "Enables or disables the automatic calling function",
+        syntax : 'autoCall (true|false)',
+        perms: 'MANAGE_GUILD (admin)'
+    },
     onexecute : (message, args) => {
         if (!message.member.hasPermission('MANAGE_GUILD')) {
             message.channel.send('Insufficient permissions!');

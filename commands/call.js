@@ -1,6 +1,10 @@
 module.exports = {
     name : 'call',
     aliases : ['chat', 'talk', 'scream'],
+    help : {
+        desc: 'Manual command to start a call',
+        syntax : 'call [user [user2 ...]]'
+    },
     onexecute : (message, args) => {
         if (args.length == 0) {
             let voiceStatus;
