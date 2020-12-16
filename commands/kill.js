@@ -1,3 +1,5 @@
+const {exec} = require('child_process');
+
 module.exports = {
     name : 'kill',
     help : {
@@ -11,6 +13,9 @@ module.exports = {
             return;
         }
 
-        process.exit(-1);
+        exec('heroku restart worker.1', (err, out, errout) => {
+            if (err) return console.error(err);
+            console.log('out: ' + out + '\nerrour: ' + errout);
+        });
     }
 }
