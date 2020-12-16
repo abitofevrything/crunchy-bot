@@ -6,7 +6,7 @@ module.exports = {
     name: "help",
     aliases: ["hlep"],
     help :{
-        desc : 'Summons this help menu, or the help for a specific command\nSyntax symbols meaning:\n`[param]` -> optional\n`[param[param1]]` -> both optional, can only use `param1` if `param` is present\n`(param)` -> required parameter\n`(param|param1)` one of `param` or `param1`\n`...` -> repeat previous options an infinite amount of times',
+        desc : 'Summons this help menu, or the help for a specific command\n\nSyntax symbols:\n`[param]` -> optional\n`[param[param1]]` -> both optional, can only use `param1` if `param` is present\n`(param)` -> required parameter\n`(param|param1)` one of `param` or `param1`\n`...` -> repeat previous options an infinite amount of times',
         syntax : 'help [command]'
     },
     onexecute : (message, args) => {
