@@ -147,7 +147,7 @@ error_code.cpp:8:89:   instantiated from here
 
     /* Alphabet */
     let letter;
-    if (message.content.toLowerCase() == (letter = client.trackedUsers.get(message.author.tag))?.repeat(message.content.length)) {
+    if (message.content.toLowerCase() == ((letter = client.trackedUsers.get(message.author.tag)) == undefined ? '' : letter).repeat(message.content.length)) {
         let isCapital = message.content.toLowerCase() != message.content;
         let letterSent = String.fromCharCode(letter.charCodeAt(0) + 1);
         message.channel.send((isCapital ? letterSent.toUpperCase() : letterSent).repeat(message.content.repeat.length));
