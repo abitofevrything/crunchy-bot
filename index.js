@@ -33,7 +33,7 @@ client.on('ready', () => {
 
     client.guilds.cache.forEach(guild => guild.members.cache.get("748580818292834446").setNickname(`Crunchy Bot v${dynoMetadata.mapping.releaseVersion}`));
 
-    console.log(JSON.stringify(dynoMetadata));
+    console.log(JSON.stringify(dynoMetadata.mapping));
 
     client.user.setStatus('online');
     client.user.setActivity('your every move', {
