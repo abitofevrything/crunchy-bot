@@ -41,6 +41,7 @@ module.exports = {
         sudoMsg.member = sudoMember;
         sudoMsg.content = prefix + sudoCommand + sudoArgs.join(' ');
         sudoMsg.mentions = message.mentions;
+        sudoMsg.client = message.client;
 
         sudoMsg.awaitReactions = message.awaitReactions;
         sudoMsg.createReactionCollector = message.createReactionCollector;
@@ -65,7 +66,7 @@ module.exports = {
         }
         sudoMsg.unpin = message.unpin;
 
-        for (let command of commands()) {
+        for (let command of commands().array()) {
             if (command.name == sudoCommand || (command.aliases ? command.aliases.includes(sudoCommand) : false)) {
                 try {
                     command.onexecute(sudoMsg, sudoArgs);

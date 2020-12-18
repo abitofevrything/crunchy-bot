@@ -2,14 +2,14 @@ const Discord = require('discord.js');
 const fs = require('fs');
 
 const client = new Discord.Client();
+client.commands = new Discord.Collection();
+client.trackedUsers = new Discord.Collection();
+client.ttt = new Discord.Collection();
 
 const token = process.argv.splice(2)[0];
 
-client.trackedUsers = new Discord.Collection();
 
 const config = require('./config.js');
-
-let commands = [];
 
 let autoCallEnabled = true;
 
@@ -21,9 +21,10 @@ function reload() {
     commands = [];
     let commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-    for (let command of commandFiles) {
-        commands.push(require('./commands/' + command));
-        console.log('Loaded command ' + command);
+    for (let commandFile of commandFiles) {
+        let command = require('./commands/' + commandFile);
+        console.log('Loaded command ' + command.name);
+        client.commands.set(command.name, command);
     }
 
     console.log('Reload complete!')
@@ -69,7 +70,7 @@ client.on('message', message => {
     if (!message.guild || message.author.bot) return;
 
 
-    for (let command of commands) {
+    for (let command of client.commands.array()) {
         if (message.content.startsWith(config.prefix + command.name) || (command.aliases ? command.aliases.includes(message.content.split(' ')[0].substring(config.prefix.length)): false)) {
             try {
                 command.onexecute(message, message.content.split(' ').splice(1).filter(arg => arg != ''));
@@ -147,7 +148,9 @@ error_code.cpp:8:89:   instantiated from here
     /* Alphabet */
     let letter;
     if (message.content.toLowerCase() == (letter = client.trackedUsers.get(message.author.tag))) {
-        message.channel.send(String.fromCharCode(letter.charCodeAt(0) + 1));
+        let isCapital = message.content.toLowerCase() != message.content;
+        let letterSent = String.fromCharCode(letter.charCodeAt(0) + 1);
+        message.channel.send(isCapital ? letterSent.toUpperCase() : letterSent);
         client.trackedUsers.set(message.author.tag, String.fromCharCode(letter.charCodeAt(0) + 2));
     } else {
         if ((client.trackedUsers.get(message.author.tag) != 'a' && client.trackedUsers.get(message.author.tag) != undefined) && client.trackedUsers.get(message.author.tag) != String.fromCharCode('z'.charCodeAt(0) + 1)) {
@@ -181,4 +184,4 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 
 client.login(token);
 
-module.exports = {reload: reload, commands : () => commands, setAutoCall : (bool) => {autoCallEnabled = (bool == "on" || bool ==  "true" || bool == "1")}}
+module.exports = {reload: reload, commands : () => client.commands, setAutoCall : (bool) => {autoCallEnabled = (bool == "on" || bool ==  "true" || bool == "1")}, client : () => client, config : config}
