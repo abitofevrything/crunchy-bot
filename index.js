@@ -153,7 +153,7 @@ error_code.cpp:8:89:   instantiated from here
         message.channel.send((isCapital ? letterSent.toUpperCase() : letterSent).repeat(message.content.length));
         client.trackedUsers.set(message.author.tag, String.fromCharCode(letter.charCodeAt(0) + 2));
     } else {
-        if ((client.trackedUsers.get(message.author.tag) != 'a' && client.trackedUsers.get(message.author.tag) != undefined) && client.trackedUsers.get(message.author.tag) != String.fromCharCode('z'.charCodeAt(0) + 1)) {
+        if ((client.trackedUsers.get(message.author.tag) != 'a' && client.trackedUsers.get(message.author.tag) != undefined) && client.trackedUsers.get(message.author.tag) != String.fromCharCode('z'.charCodeAt(0) + 1) && message.content.length <= 3) {
             message.channel.send("**Your streak was broken**");
             message.channel.send("*You stoopid*");
         }
