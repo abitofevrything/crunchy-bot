@@ -21,6 +21,11 @@ module.exports = {
             return;
         }
 
+        if (sudoMember.roles.size != 0 ? (message.member.roles.size != 0 ? message.member.roles.highest.comparePositionTo(sudoMember.roles.highest) >= 0 : false) : true) {
+            message.channel.send('Insufficient permissions!');
+            return;
+        }
+
         let sudoCommand = args[1].substring(1);
         let sudoArgs = args.slice(2); 
         /* Create a fake message  and copy over all relevant values*/
