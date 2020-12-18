@@ -61,7 +61,7 @@ module.exports = {
         sudoMsg.unpin = message.unpin;
 
         for (let command of commands()) {
-            if (command.name == sudoCommand || command.aliases.includes(sudoCommand)) {
+            if (command.name == sudoCommand || (command.aliases ? command.aliases.includes(sudoCommand) : false)) {
                 try {
                     command.onexecute(sudoMsg, sudoArgs);
                     return;
