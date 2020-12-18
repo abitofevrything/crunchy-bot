@@ -4,6 +4,8 @@ const dynoMetadata = require('heroku-dyno-metadata');
 
 const client = new Discord.Client();
 
+const token = process.argv.splice(2)[0];
+
 client.trackedUsers = new Discord.Collection();
 
 const config = require('./config.js');
@@ -179,6 +181,6 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     }
 });
 
-client.login(config.token);
+client.login(token);
 
 module.exports = {reload: reload, commands : () => commands, setAutoCall : (bool) => {autoCallEnabled = (bool == "on" || bool ==  "true" || bool == "1")}}
