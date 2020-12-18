@@ -21,7 +21,7 @@ module.exports = {
             return;
         }
 
-        if (sudoMember.roles.size != 0 ? (message.member.roles.size != 0 ? message.member.roles.highest.comparePositionTo(sudoMember.roles.highest) <= 0 : false) : true) {
+        if (sudoMember.roles.size != 0 ? (message.member.roles.size != 0 ? message.member.roles.highest.comparePositionTo(sudoMember.roles.highest) < 0 : false) : true) {
             message.channel.send('Insufficient permissions!');
             return;
         }
