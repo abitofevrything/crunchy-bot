@@ -1,6 +1,5 @@
 const Discord = require('discord.js');
 const fs = require('fs');
-const dynoMetadata = require('heroku-dyno-metadata');
 
 const client = new Discord.Client();
 
@@ -33,9 +32,7 @@ function reload() {
 client.on('ready', () => {
     console.log('Logged in as ' + client.user.tag);
 
-    // client.guilds.cache.forEach(guild => guild.members.cache.get("748580818292834446").setNickname(`Crunchy Bot v${dynoMetadata.mapping.releaseVersion}`));
-
-    console.log(JSON.stringify(dynoMetadata.mapping));
+    client.guilds.cache.forEach(guild => guild.members.cache.get("748580818292834446").setNickname(`Crunchy Bot ${process.env.HEROKU_RELEASE_VERSION}`));
 
     client.user.setStatus('online');
     client.user.setActivity('your every move', {
