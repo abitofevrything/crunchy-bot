@@ -31,7 +31,7 @@ function reload() {
 client.on('ready', () => {
     console.log('Logged in as ' + client.user.tag);
 
-    client.guilds.cache.forEach(guild => guild.members.cache.get("748580818292834446").setNickname(`Crunchy Bot v${dynoMetadata.mapping.releaseVersion}`));
+    // client.guilds.cache.forEach(guild => guild.members.cache.get("748580818292834446").setNickname(`Crunchy Bot v${dynoMetadata.mapping.releaseVersion}`));
 
     console.log(JSON.stringify(dynoMetadata.mapping));
 
