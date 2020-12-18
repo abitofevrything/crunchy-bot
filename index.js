@@ -32,7 +32,8 @@ function reload() {
 client.on('ready', () => {
     console.log('Logged in as ' + client.user.tag);
 
-    client.guilds.cache.forEach(guild => guild.members.cache.get("748580818292834446").setNickname(`Crunchy Bot ${process.env.HEROKU_RELEASE_VERSION}`));
+    client.guilds.cache.forEach(guild => guild.members.cache.get("748580818292834446").setNickname(`Crunchy Bot 
+    ${process.env.HEROKU_RELEASE_VERSION}`));
 
     client.user.setStatus('online');
     client.user.setActivity('your every move', {
