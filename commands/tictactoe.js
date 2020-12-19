@@ -83,7 +83,7 @@ function createEmbed(data, playerXName, playerOName) {
     let board = "```\n";
     let o = data[0][0], t = data[0][1], r = data[0][2], f = data[1][0], i = data[1][1], s = data[1][2], e = data[2][0], g = data[2][1], n = data[2][2];
     board += "┏━━━┳━━━┳━━━┓\n";
-    board += "┃ " + o + " ┃ " + t + " ┃ " + r + " ┃    X: " + playerXName + "\n";
+    board += "┃ " + o + " ┃ " + t + " ┃ " + r + " ┃     X: " + playerXName + "\n";
     board += "┣━━━╋━━━╋━━━┫     O: " + playerOName + "\n";
     board += "┃ " + f + " ┃ " + i + " ┃ " + s + " ┃\n";
     board += "┣━━━╋━━━╋━━━┫\n";
@@ -156,12 +156,13 @@ module.exports = {
 
             setUserData(opponent, opponentData);
 
+            let opponentName = message.guild.members.cache.get(opponent).displayName;
 
-            getChannel(playerData.channel).send(createEmbed(newBoard));
+            getChannel(playerData.channel).send(createEmbed(newBoard, (playerData.me == 0 ? player.displayName : opponentName), (playerData.me == 1 ? player.displayName : opponentName)));
             
             let result = checkWin(newBoard);
 
-            if (result == 'X' || result == 'Y') {
+            if (result == 'X' || result == 'O') {
                 //one wins
                 if (result == 'X') {
                     getChannel(playerData.channel).send((playerData.me == 0 ? "<@" + player + ">" : "<@" + opponent + ">") + " wins!");
