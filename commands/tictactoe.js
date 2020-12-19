@@ -193,7 +193,8 @@ module.exports = {
                 message.channel.send("Couldn't find user " + args[0]);
                 return;
             }
-            if (opponent.user.id == message.client.user.id) opponent = undefined;
+
+            if (opponent != undefined && opponent.user.id == message.client.user.id) opponent = undefined;
 
             if (opponent) {
                 if (getUserData(opponent).opponent == player.id) {
