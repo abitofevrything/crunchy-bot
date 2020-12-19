@@ -79,7 +79,7 @@ client.on('message', message => {
                 if (message.author.id == 506759329068613643) {
                     message.channel.send('Error while processing that command: \n```' + e + "\n```");
                 } else {
-                    message.channel.send(`@${message.author.toString()}, there was an internal error while processing that command.`);
+                    message.channel.send(`${message.author.toString()}, there was an internal error while processing that command.`);
                 }
                 console.error(e);
             }
