@@ -1,4 +1,4 @@
-const { GuildMember, MessageEmbed } = require('discord.js');
+const { MessageEmbed } = require('discord.js');
 const index = require('../index.js');
 
 const timeOutMillis = 30 * 60 * 1000;
@@ -77,14 +77,14 @@ function setUserData(member, data) {
     index.client().ttt.set(id, data);
 }
 
-function createEmbed(data) {
+function createEmbed(data, playerXName, playerOName) {
     let embed = new MessageEmbed();
     embed.setTitle("Tic-Tac-Toe");
     let board = "```\n";
     let o = data[0][0], t = data[0][1], r = data[0][2], f = data[1][0], i = data[1][1], s = data[1][2], e = data[2][0], g = data[2][1], n = data[2][2];
     board += "┏━━━┳━━━┳━━━┓\n";
-    board += "┃ " + o + " ┃ " + t + " ┃ " + r + " ┃\n";
-    board += "┣━━━╋━━━╋━━━┫\n";
+    board += "┃ " + o + " ┃ " + t + " ┃ " + r + " ┃    X: " + playerXName + "\n";
+    board += "┣━━━╋━━━╋━━━┫     O: " + playerOName + "\n";
     board += "┃ " + f + " ┃ " + i + " ┃ " + s + " ┃\n";
     board += "┣━━━╋━━━╋━━━┫\n";
     board += "┃ " + e + " ┃ " + g + " ┃ " + n + " ┃\n";
@@ -217,7 +217,7 @@ module.exports = {
                         me : 1 - challengerId
                     });
 
-                    let embed = createEmbed(getUserData(player).board);
+                    let embed = createEmbed(getUserData(player).board, challengerId == 0 ? player.displayName : opponent.displayName, challengerId == 1 ? player.displayName : opponent.displayName);
                     message.channel.send(embed);
                     if (challengerId == 0) {
                         message.channel.send(player.toString() + ", it's your turn!");
