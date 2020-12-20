@@ -69,7 +69,7 @@ client.on('message', message => {
     }
 
     if (message.author.id == "204255221017214977") {
-        lastYAGPDBMessage = message.guild.id + "/" + message.channel.id + "/" message.id;
+        lastYAGPDBMessage = message.guild.id + "/" + message.channel.id + "/" + message.id;
     }
 
     if (!message.guild || message.author.bot) return;
