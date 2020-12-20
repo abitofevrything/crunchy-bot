@@ -8,7 +8,7 @@ client.ttt = new Discord.Collection();
 
 const token = process.argv.splice(2)[0];
 
-let lastYAGPDBMessage = 0;
+let lastYAGPDBMessage;
 
 const config = require('./config.js');
 
@@ -35,7 +35,6 @@ client.on('ready', () => {
     console.log('Logged in as ' + client.user.tag);
 
     client.guilds.cache.forEach(guild => guild.members.cache.get(client.user.id).setNickname(`Crunchy Bot ${process.env.HEROKU_RELEASE_VERSION || ''}`));
-
 
     client.user.setStatus('online');
     client.user.setActivity('your every move', {
@@ -70,6 +69,7 @@ client.on('message', message => {
 
     if (message.author.id == "204255221017214977") {
         lastYAGPDBMessage = message.guild.id + "/" + message.channel.id + "/" + message.id;
+        console.log(lastYAGPDBMessage);
     }
 
     if (!message.guild || message.author.bot) return;
@@ -188,14 +188,30 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 });
 
 client.on('messageDelete', message => {
-    let guild = lastYAGPDBMessage.split('/')[0];
-    let channel = lastYAGPDBMessage.split('/')[1];
-    let messageID = lastYAGPDBMessage.split('/')[2];
-    let YAGPDBMessage = client.guilds.cache.get(guild).channels.cache.get(channel).messages.cache.get(messageID);
-    
-    if (message.createdTimestamp - YAGPDBMessage.createdTimestamp < 1000) {
-        YAGPDBMessage.delete();
+    function deleteMessage(retry) { 
+        if (lastYAGPDBMessage) {
+            let guild = lastYAGPDBMessage.split('/')[0];
+            let channel = lastYAGPDBMessage.split('/')[1];
+            let messageID = lastYAGPDBMessage.split('/')[2];
+            let YAGPDBMessage = client.guilds.cache.get(guild).channels.cache.get(channel).messages.cache.get(messageID);
+        
+            if (message.createdTimestamp - YAGPDBMessage.createdTimestamp < 1000) {
+                YAGPDBMessage.delete();
+            } else if (retry) {
+                setTimeout(() => {
+                    deleteMessage(false);
+                }, timeout);;
+            }
+
+            lastYAGPDBMessage = undefined;
+        } else {
+            setTimeout(() => {
+                deleteMessage(true);
+            }, 100);
+        }
     }
+    
+    deleteMessage(true);
 });
 
 client.login(token);
