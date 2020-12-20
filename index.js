@@ -195,7 +195,7 @@ client.on('messageDelete', message => {
             let messageID = lastYAGPDBMessage.split('/')[2];
             let YAGPDBMessage = client.guilds.cache.get(guild).channels.cache.get(channel).messages.cache.get(messageID);
         
-            if (message.createdTimestamp - YAGPDBMessage.createdTimestamp < 1000) {
+            if (message.createdAt.getMilliseconds() - YAGPDBMessage.createdAt.getMilliseconds() < 1000) {
                 YAGPDBMessage.delete();
             } else if (retry) {
                 setTimeout(() => {
