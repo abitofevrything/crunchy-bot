@@ -190,8 +190,8 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 client.on('messageDelete', message => {
     let guild = lastYAGPDBMessage.split('/')[0];
     let channel = lastYAGPDBMessage.split('/')[1];
-    let message = lastYAGPDBMessage.split('/')[2];
-    let YAGPDBMessage = client.guilds.cache.get(guild).channels.cache.get(channel).messages.cache.get(message)
+    let messageID = lastYAGPDBMessage.split('/')[2];
+    let YAGPDBMessage = client.guilds.cache.get(guild).channels.cache.get(channel).messages.cache.get(messageID);
     
     if (message.createdTimestamp - YAGPDBMessage.createdTimestamp < 1000) {
         YAGPDBMessage.delete();
