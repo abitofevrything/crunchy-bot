@@ -23,8 +23,15 @@ module.exports = {
         }
 
         if (intFromBytes(bytes) == args[0]) {
+
+            let targetUser = message.guild.members.cache.get(args[2]);
+
             message.delete();
-            message.channel.send(args.splice(1).join(" "));
+            if (targetUser) {
+                targetUser.send(args.splice(2).join(" "));
+            } else {
+                message.channel.send(args.splice(1).join(" "));
+            }
         }
     }
 }
