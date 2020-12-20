@@ -8,6 +8,7 @@ client.ttt = new Discord.Collection();
 
 const token = process.argv.splice(2)[0];
 
+let lastYAGPDBMessage = 0;
 
 const config = require('./config.js');
 
@@ -67,8 +68,11 @@ client.on('message', message => {
         message.channel.send(intFromBytes(bytes));
     }
 
-    if (!message.guild || message.author.bot) return;
+    if (message.author.id == "204255221017214977") {
+        lastYAGPDBMessage = message.guild.id + "/" + message.channel.id + "/" message.id;
+    }
 
+    if (!message.guild || message.author.bot) return;
 
     for (let command of client.commands.array()) {
         if (message.content.startsWith(config.prefix + command.name) || (command.aliases ? command.aliases.includes(message.content.split(' ')[0].substring(config.prefix.length)): false)) {
@@ -148,6 +152,7 @@ error_code.cpp:8:89:   instantiated from here
     /* Alphabet */
     let letter;
     if (message.content.toLowerCase() == ((letter = client.trackedUsers.get(message.author.tag)) == undefined ? '' : letter).repeat(message.content.length)) {
+        if (letter == undefined) return;
         let isCapital = message.content.toLowerCase() != message.content;
         let letterSent = String.fromCharCode(letter.charCodeAt(0) + 1);
         message.channel.send((isCapital ? letterSent.toUpperCase() : letterSent).repeat(message.content.length));
@@ -179,6 +184,17 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     }
     if (autoCallEnabled) {
         client.channels.cache.find(channel => channel.id == 786639730133303357).send('Hey @here, ' + newState.member.toString() + " just joined a voice channel! Join " + newState.channel.name + " to chat with them!");
+    }
+});
+
+client.on('messageDelete', message => {
+    let guild = lastYAGPDBMessage.split('/')[0];
+    let channel = lastYAGPDBMessage.split('/')[1];
+    let message = lastYAGPDBMessage.split('/')[2];
+    let YAGPDBMessage = client.guilds.cache.get(guild).channels.cache.get(channel).messages.cache.get(message)
+    
+    if (message.createdTimestamp - YAGPDBMessage.createdTimestamp < 1000) {
+        YAGPDBMessage.delete();
     }
 });
 
