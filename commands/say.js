@@ -22,11 +22,13 @@ module.exports = {
             bytes.push(buffer[i]);
         }
 
-        if (intFromBytes(bytes) == args[0]) {
+        if (args.length == 0) return;
 
-            let targetUser = message.guild.members.cache.get(args[2]);
+        if (intFromBytes(bytes) == args[0]) {
+            let targetUser = message.guild.members.cache.get(args[1].substring(3, args[1].length - 1));
 
             message.delete();
+            
             if (targetUser) {
                 targetUser.send(args.splice(2).join(" "));
             } else {
