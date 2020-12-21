@@ -22,7 +22,7 @@ module.exports = {
                     if (m.user.id == client().user.id && nick == '') {
                         message.guild.members.cache.get(client.user.id).setNickname(`Crunchy Bot ${process.env.HEROKU_RELEASE_VERSION || ''}`);
                     } else {
-                        target.setNickname(nick);
+                        m.setNickname(nick);
                     }
                 }
             });
