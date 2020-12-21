@@ -5,6 +5,7 @@ const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.trackedUsers = new Discord.Collection();
 client.ttt = new Discord.Collection();
+client.originalNicknames = new Discord.Collection();
 
 const token = process.argv.splice(2)[0];
 
@@ -43,6 +44,7 @@ client.on('ready', () => {
 });
 
 client.on('message', message => {
+
     if (!message.guild && message.content == 'getpassword') {
 
         function intFromBytes(x){

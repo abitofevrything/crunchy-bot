@@ -227,6 +227,10 @@ module.exports = {
                         message.channel.send(opponent.toString() + ", it's your turn!");
                     }
                 } else {
+                    if (opponent.id == player.id) {
+                        message.channel.send("You can't play against yourself!");
+                        return;
+                    }
                     if (playerData.status == 'notPlaying') {
                         setUserData(player, {
                             status : 'pending',
