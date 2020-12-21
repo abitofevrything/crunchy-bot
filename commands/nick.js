@@ -1,3 +1,5 @@
+const { client } = require('../index.js');
+
 module.exports = {
     name : 'nick',
     aliases : ['n'],
@@ -14,7 +16,7 @@ module.exports = {
 
         let target = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
 
-        if (target.manageable) {
+        if (target.manageable || target.user.id == client().user.id) {
             target.setNickname(args.splice(1).join(" "));
         } else {
             message.channel.send('Cannot edit ' + target.toString() + "'s name!");
