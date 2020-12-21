@@ -19,7 +19,7 @@ module.exports = {
         let nick = args.splice(1).join(" ");
 
         if (message.mentions.everyone) {
-            message.guild.members.cache.foreach(m => {
+            message.guild.members.cache.forEach(m => {
                 if (m.manageable) {
                     if (target.user.id == client().user.id && nick == '') {
                     message.guild.members.cache.get(client.user.id).setNickname(`Crunchy Bot ${process.env.HEROKU_RELEASE_VERSION || ''}`);
