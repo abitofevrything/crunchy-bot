@@ -14,15 +14,13 @@ module.exports = {
             return;
         }
 
-        let target = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
-
         let nick = args.splice(1).join(" ");
 
         if (message.mentions.everyone) {
             message.guild.members.cache.forEach(m => {
                 if (m.manageable) {
-                    if (target.user.id == client().user.id && nick == '') {
-                    message.guild.members.cache.get(client.user.id).setNickname(`Crunchy Bot ${process.env.HEROKU_RELEASE_VERSION || ''}`);
+                    if (m.user.id == client().user.id && nick == '') {
+                        message.guild.members.cache.get(client.user.id).setNickname(`Crunchy Bot ${process.env.HEROKU_RELEASE_VERSION || ''}`);
                     } else {
                         target.setNickname(nick);
                     }
@@ -30,6 +28,8 @@ module.exports = {
             });
             return;
         }
+        
+        let target = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
 
         if (!target) {
             message.channel.send('Cannot fid user ' + args[0]);
