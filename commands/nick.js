@@ -16,8 +16,27 @@ module.exports = {
 
         let target = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
 
+        let nick = args.splice(1).join(" ");
+
+        if (message.mentions.everyone) {
+            message.guild.members.cache.foreach(m => {
+                if (m.manageable) {
+                    if (target.user.id == client().user.id && nick == '') {
+                    message.guild.members.cache.get(client.user.id).setNickname(`Crunchy Bot ${process.env.HEROKU_RELEASE_VERSION || ''}`);
+                    } else {
+                        target.setNickname(nick);
+                    }
+                }
+            });
+            return;
+        }
+
+        if (!target) {
+            message.channel.send('Cannot fid user ' + args[0]);
+            return;
+        }
+
         if (target.manageable || target.user.id == client().user.id) {
-            let nick = args.splice(1).join(" ");
             if (target.user.id == client().user.id && nick == '') {
             message.guild.members.cache.get(client.user.id).setNickname(`Crunchy Bot ${process.env.HEROKU_RELEASE_VERSION || ''}`);
             } else {
