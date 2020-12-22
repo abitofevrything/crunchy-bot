@@ -9,7 +9,7 @@ module.exports = {
         perms : 'MANAGE_MEMBERS'
     },
     onexecute : (message, args) => {
-        if (!message.member.hasPermission('MANAGE_MEMBERS')) {
+        if (!message.member.hasPermission('MANAGE_GUILD')) {
             message.channel.send('Insufficient permissions!');
             return;
         }
