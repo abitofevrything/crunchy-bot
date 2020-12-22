@@ -6,7 +6,7 @@ module.exports = {
     help : {
         desc : 'Sets the nickname of a user',
         syntax : 'nick (user) (nickname)',
-        perms : 'MANAGE_MEMBERS'
+        perms : 'MANAGE_GUILD'
     },
     onexecute : (message, args) => {
         if (!message.member.hasPermission('MANAGE_GUILD')) {
