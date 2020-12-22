@@ -9,8 +9,7 @@ module.exports = {
         perms : 'MANAGE_GUILD'
     },
     onexecute : (message, args) => {
-        return;
-        if (!message.member.hasPermission('MANAGE_GUILD')) {
+        /*if (!message.member.hasPermission('MANAGE_GUILD')) {
             message.channel.send('Insufficient permissions!');
             return;
         }
@@ -45,7 +44,7 @@ module.exports = {
             }
         } else {
             message.channel.send('Cannot edit ' + target.toString() + "'s name!");
-        }
+        }*/
     }
 
 }
