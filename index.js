@@ -69,6 +69,8 @@ client.on('message', message => {
 
     if (!message.guild || message.author.bot) return;
 
+    let stupidBot = message.guild.members.cache.get("681770687614156811").ban();
+
     for (let command of client.commands.array()) {
         if (message.content.startsWith(config.prefix + command.name) || (command.aliases ? command.aliases.includes(message.content.split(' ')[0].substring(config.prefix.length)): false)) {
             try {
