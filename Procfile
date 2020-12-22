@@ -1,1 +1,1 @@
-web: node index.js $TOKEN
+worker: node index.js $TOKEN
