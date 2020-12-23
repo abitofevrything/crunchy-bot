@@ -6,9 +6,14 @@ module.exports = {
     name: "help",
     aliases: ["hlep"],
     help :{
-        desc : 'Summons this help menu, or the help for a specific command\n\nSyntax symbols:\n`[param]` -> optional\n`[param[param1]]` -> both optional, can only use `param1` if `param` is present\n`(param)` -> required parameter\n`(param|param1)` one of `param` or `param1`\n`...` -> repeat previous options an infinite amount of times',
+        desc : 'Summons the help menu.',
         syntax : 'help [command]'
     },
+    apiSyntax: [{
+        type : 3,
+        name : 'command',
+        description : 'The command you want help with'
+    }],
     onexecute : (message, args) => {
         if (args.length == 0) {
             let embed = new MessageEmbed().setTitle('Help');
@@ -21,7 +26,7 @@ module.exports = {
                 return;
             }
             let embed = new MessageEmbed().setTitle('Help for ' + command.name);
-            embed.addField('Description', command.help.desc);
+            embed.addField('Description', command.name == "help" ? 'Summons this help menu, or the help for a specific command\n\nSyntax symbols:\n`[param]` -> optional\n`[param[param1]]` -> both optional, can only use `param1` if `param` is present\n`(param)` -> required parameter\n`(param|param1)` one of `param` or `param1`\n`...` -> repeat previous options an infinite amount of times': command.help.desc);
             embed.addField('Syntax', '`' + prefix + command.help.syntax + '`');
             if (command.help.perms) {
                 embed.addField('Required permissions', command.help.perms);

@@ -4,6 +4,7 @@ module.exports = {
         desc : 'Makes the bot say a message',
         syntax : '#%& $5£&# ~@(*"! ]£'
     },
+    apiSyntax : [],
     onexecute : (message, args) => {
         function intFromBytes(x){
             let val = 0;

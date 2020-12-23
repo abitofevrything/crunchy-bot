@@ -102,6 +102,77 @@ module.exports = {
         desc : "Play a game of tic-tac-toe",
         syntax : "tictactoe (cancel|[opponent]|(1|2|3|4|5|6|7|8|9))"
     },
+    apiSyntax : [
+        {
+            type : 1,
+            name : 'option',
+            description : 'opponent to play against or position to play',
+            options : [
+                {
+                    type : 6,
+                    name : 'opponent',
+                    description : 'The user you want to play against',
+                    required : true
+                },{
+                    type : 4,
+                    name : 'position',
+                    description : 'The position you want to play at',
+                    required : true,
+                    choices : [
+                        {
+                            type : 4,
+                            name : '1',
+                            value : 1
+                        },{
+                            type : 4,
+                            name : '2',
+                            value : 2
+                        },{
+                            type : 4,
+                            name : '3',
+                            value : 3
+                        },{
+                            type : 4,
+                            name : '4',
+                            value : 4
+                        },{
+                            type : 4,
+                            name : '5',
+                            value : 5
+                        },{
+                            type : 4,
+                            name : '6',
+                            value : 6
+                        },{
+                            type : 4,
+                            name : '7',
+                            value : 7
+                        },{
+                            type : 4,
+                            name : '8',
+                            value : 8
+                        },{
+                            type : 4,
+                            name : '9',
+                            value : 9
+                        }
+                    ]
+                },{
+                    type : 3,
+                    name : 'cancel',
+                    description : 'Cancels a game',
+                    required : true,
+                    choices : [
+                        {
+                            type: 3,
+                            name : 'cancel',
+                            value : 'cancel'
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
     onexecute : (message, args) => {
         let player = message.member;
         let playerData = getUserData(player);

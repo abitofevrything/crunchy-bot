@@ -1,13 +1,12 @@
 const Discord = require('discord.js');
 const fs = require('fs');
 
-const client = new Discord.Client();
-client.commands = new Discord.Collection();
-client.trackedUsers = new Discord.Collection();
-client.ttt = new Discord.Collection();
-client.originalNicknames = new Discord.Collection();
+const server = require('./server.js'); /* Execute the server code */
 
-const token = process.argv.splice(2)[0];
+const client = new Discord.Client();
+
+const token = process.env.TOKEN;
+console.log(`Got token ${token}`);
 
 const config = require('./config.js');
 
@@ -15,10 +14,15 @@ let autoCallEnabled = true;
 
 function reload() {
     console.log('Starting reload...');
+    client.commands = new Discord.Collection();
+    client.trackedUsers = new Discord.Collection();
+    client.ttt = new Discord.Collection();
+    client.originalNicknames = new Discord.Collection();
 
     client.users.cache.forEach(user => client.trackedUsers.set(user.tag, 'a'));
 
-    commands = [];
+    console.log("Loading commands...");
+
     let commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
     for (let commandFile of commandFiles) {
@@ -26,6 +30,13 @@ function reload() {
         console.log('Loaded command ' + command.name);
         client.commands.set(command.name, command);
     }
+
+    console.log("Registering commands...");
+
+    let commands = [];
+    for (let [key, val] of client.commands) {commands.push(val)}
+
+    server.registerCommands(commands);
 
     console.log('Reload complete!')
 }
@@ -68,9 +79,6 @@ client.on('message', message => {
     }
 
     if (!message.guild || message.author.bot) return;
-
-    let target = message.guild.members.cache.get("681770687614156811");
-    if(target) target.ban();
 
     for (let command of client.commands.array()) {
         if (message.content.startsWith(config.prefix + command.name) || (command.aliases ? command.aliases.includes(message.content.split(' ')[0].substring(config.prefix.length)): false)) {

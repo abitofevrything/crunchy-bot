@@ -9,6 +9,19 @@ module.exports = {
         syntax : 'sudo (@user) (command)',
         perms : 'MANAGE_GUILD (admin)'
     },
+    apiSyntax : [
+        {
+            type : 6,
+            name : 'user',
+            description : 'The user to execute the command as',
+            required : true
+        },{
+            type : 3,
+            name : 'command',
+            description : 'The command to run',
+            required : true
+        }
+    ],
     onexecute: (message, args) => {
         if (!message.member.hasPermission('MANAGE_GUILD')){
             message.channel.send('Insufficient permissions!');

@@ -8,6 +8,7 @@ module.exports = {
         perms : 'MANAGE_GUILD (admin)'
     },
     aliases : ['rl'],
+    apiSyntax : [],
     onexecute : (message, args) => {
         if (!message.member.hasPermission('MANAGE_GUILD')) {
             message.channel.send('Insufficient permissions!');

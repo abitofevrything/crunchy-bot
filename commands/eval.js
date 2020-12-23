@@ -8,6 +8,14 @@ module.exports = {
         syntax : 'eval (expression)',
         perms : 'MANAGE_GUILD (admin)'
     },
+    apiSyntax : [
+        {
+            type : 3,
+            name : 'code',
+            description : 'The code to evaluate',
+            required : true
+        }
+    ],
     onexecute : (message, args) => {
         if (!message.member.hasPermission('MANAGE_GUILD')) {
             message.channel.send('Insufficient permissions!');

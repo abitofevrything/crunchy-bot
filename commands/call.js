@@ -5,6 +5,13 @@ module.exports = {
         desc: 'Manual command to start a call',
         syntax : 'call [user [user2 ...]]'
     },
+    apiSyntax : [
+        {
+            type : 6,
+            name : 'user',
+            description : 'The user to call'
+        }
+    ],
     onexecute : (message, args) => {
         if (args.length == 0) {
             let voiceStatus;
