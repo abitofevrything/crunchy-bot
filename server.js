@@ -157,8 +157,10 @@ http.createServer((req, res) => {
                     /* No need to check for aliases */
                     if (command.name == c.name) {
                         let args = [];
-                        for (let arg of body.data.options) {
-                            args.push(arg.value);
+                        if (body.data.options) {
+                            for (let arg of body.data.options) {
+                                args.push(arg.value);
+                            }
                         }
 
                         let guild = index.client().guilds.cache.get(body.guild_id);
