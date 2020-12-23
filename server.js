@@ -236,6 +236,7 @@ http.createServer((req, res) => {
                 }
 
             } else {
+                console.log('Got invalid request');
                 /* Invalid signature */
                 res.statusCode = 401;
                 res.end('{"message":"Invalid Request Signature"}');
