@@ -165,7 +165,7 @@ http.createServer((req, res) => {
 
                         console.log("Getting members...");
 
-                        guild.members.fetch({force : true}).then(members => {
+                        guild.members.fetch().then(members => {
                             console.log("Got members");
 
                             let member = members.find(m => m.user.id == body.member.user.id);
