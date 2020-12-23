@@ -1,4 +1,4 @@
 module.exports = {
-    "prefix":"!",
+    "prefix":"/",
     "hornyWords":["niger", "nigger", "niga", "nigga", "hentai", "penis", "dick", "scholng"]
 }
