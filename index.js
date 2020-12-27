@@ -3,6 +3,8 @@ const fs = require('fs');
 
 const server = require('./server.js'); /* Execute the server code */
 
+const fetch = require('node-fetch');
+
 const client = new Discord.Client();
 
 const token = process.env.TOKEN;
@@ -13,10 +15,15 @@ const config = require('./config.js');
 let autoCallEnabled = true;
 
 function reload() {
+    fetch(`https://${process.env.HEROKU_APP_NAME}.herokuapp.com/ttt/set`, {
+        method : 'POST',
+        headers : {
+            authorization : `Internal ${token}`
+        }
+    }).then(res => {});
+
+
     console.log('Starting reload...');
-    client.commands = new Discord.Collection();
-    client.trackedUsers = new Discord.Collection();
-    client.ttt = new Discord.Collection();
     client.originalNicknames = new Discord.Collection();
 
     client.users.cache.forEach(user => client.trackedUsers.set(user.tag, 'a'));

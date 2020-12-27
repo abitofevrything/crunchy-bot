@@ -1,7 +1,16 @@
 const http = require('http');
 const nacl = require('tweetnacl');
 const fetch = require('node-fetch');
-const { Collection, MessageMentions, ReactionManager, ReactionCollector } = require('discord.js');
+const { Collection, ReactionCollector } = require('discord.js');
+
+const storage = {
+    commands : new Collection(),
+    trackedUsers : new Collection(),
+    ttt : new Collection(),
+    originalNicknames : new Collection()
+}
+
+const isWebDyno = process.argv[2] == 'web';
 
 let index;
 
@@ -74,7 +83,7 @@ function registerCommands(commands) {
                 method : 'POST',
                 headers : {
                     "Authorization" : `Bot ${TOKEN}`,
-                    "User-Agent" : `Crunchy Bot (https://${process.env.HEROKU_APP_NAME}.herokuapp.com/ , ${process.env.HEROKU_RELEASE_VERSION})`,
+                    "User-Agent" : `Crunchy Bot (https://${process.env.HEROKU_APP_NAME}.herokuapp.com/, ${process.env.HEROKU_RELEASE_VERSION})`,
                     "Content-Type" : "application/json"
                 },
                 body : JSON.stringify({
@@ -120,137 +129,145 @@ function registerCommands(commands) {
     });
 }
 
-http.createServer((req, res) => {
-    let requestBody = '';
-    req.on('data', (data) => {
-        requestBody += data;
-    });
+/* If dyno is web dyno, spin up the server. if not, do nothing */
+if (isWebDyno) {
+    http.createServer((req, res) => {
+        let requestBody = '';
+        req.on('data', (data) => {
+            requestBody += data;
+        });
 
-    req.on('end', () => {
-        try {
-            let body = JSON.parse(requestBody);
-            let headers = req.headers;
+        req.on('end', () => {
+            try {
+                let body = JSON.parse(requestBody);
+                let headers = req.headers;
 
-            if (checkValidity(headers, requestBody)) {
-                console.log('Got valid request!');
-                if (body.type == 1) {
-                    /* Ping request */
-                    res.statusCode = 200;
-                    res.end('{"type":1}');
-                    return;
-                }
-                /* Handle Incoming Events */
-                let c = body.data;
-                if (!c) {
-                    res.statusCode = 400;
-                    res.end('{"message":"Bad Request"}');
+                /* Cross-Dyno request */
+                if (headers.authorization == `Internal ${TOKEN}`) {
+                    let options = req.url.split('/');
+                    console.log(options);
                     return;
                 }
 
-                if (!index) {
-                    index = require('./index.js');
-                }
-
-                let commands = index.commands().array();
-
-                for (let command of commands) {
-                    /* No need to check for aliases */
-                    if (command.name == c.name) {
-                        let args = [];
-                        if (body.data.options) {
-                            for (let arg of body.data.options) {
-                                args.push(arg.value);
-                            }
-                        }
-
-                        let guild = index.client().guilds.cache.get(body.guild_id);
-
-                        console.log("Getting members...");
-
-                        guild.members.fetch().then(members => {
-                            console.log("Got members");
-
-                            let member = members.find(m => m.user.id == body.member.user.id);
-
-                            let fakeMsg = {};
-
-                            fakeMsg.activity = {};
-                            fakeMsg.application = undefined;
-                            fakeMsg.attachments = new Collection();
-                            fakeMsg.author = member.user;
-                            fakeMsg.channel = guild.channels.cache.get(body.channel_id);
-                            fakeMsg.cleanContent = "";
-                            fakeMsg.client = index.client();
-                            fakeMsg.content = index.config.prefix + c.name + ' ' + args.join(' ');
-                            fakeMsg.createdAt = new Date();
-                            fakeMsg.createdTimestamp = Date.now();
-                            fakeMsg.crosspostable = false;
-                            fakeMsg.deletable = false;
-                            fakeMsg.deleted = true;
-                            fakeMsg.editable = false;
-                            fakeMsg.editedAt = null;
-                            fakeMsg.editedTimestamp = null;
-                            fakeMsg.edits = [];
-                            fakeMsg.embeds = [];
-                            fakeMsg.flags = [];
-                            fakeMsg.guild = guild;
-                            fakeMsg.id = 0;
-                            fakeMsg.member = member;
-                            fakeMsg.mentions = null;
-                            fakeMsg.nonce = null;
-                            fakeMsg.partial = false;
-                            fakeMsg.pinnable = false;
-                            fakeMsg.pinned = false;
-                            fakeMsg.reactions = null;
-                            fakeMsg.reference = null;
-                            fakeMsg.system = false;
-                            fakeMsg.tts = false;
-                            fakeMsg.type = 'DEFAULT';
-                            fakeMsg.url = 'https://discord.com/app';
-                            fakeMsg.webhookID = null;
-
-                            fakeMsg.awaitReactions = () => {return new Promise((resolve) => {resolve(new Collection())});};
-                            fakeMsg.createReactionCollector = () => new ReactionCollector();
-                            fakeMsg.crosspost = () => {};
-                            fakeMsg.delete = () => {};
-                            fakeMsg.edit = () => {};
-                            fakeMsg.equals = () => false;
-                            fakeMsg.fetch = () =>  new Promise((resolve, reject) => {}) /* Never resolve promise */;
-                            fakeMsg.fetchWebhook = () => new Promise((resolve) => {resolve(undefined)});
-                            fakeMsg.pin = () => {};
-                            fakeMsg.react = () => {};
-                            fakeMsg.suppressEmbeds = () => {};
-                            fakeMsg.toString = () => fakeMsg.content;
-                            fakeMsg.unpin = () => {};
-                            
-                            console.log("Executing command " + command.name + " with args " + args);
-
-                            command.onexecute(fakeMsg, args);
-
-                            console.log("Command executed!");
-
-                            res.statusCode = 200;
-                            res.end('{"message":"Command executed"}');
-                        });
-
-                        break;
+                if (checkValidity(headers, requestBody)) {
+                    console.log('Got valid request!');
+                    if (body.type == 1) {
+                        /* Ping request */
+                        res.statusCode = 200;
+                        res.end('{"type":1}');
+                        return;
                     }
+                    /* Handle Incoming Events */
+                    let c = body.data;
+                    if (!c) {
+                        res.statusCode = 400;
+                        res.end('{"message":"Bad Request"}');
+                        return;
+                    }
+
+                    if (!index) {
+                        index = require('./index.js');
+                    }
+
+                    let commands = index.commands().array();
+
+                    for (let command of commands) {
+                        /* No need to check for aliases */
+                        if (command.name == c.name) {
+                            let args = [];
+                            if (body.data.options) {
+                                for (let arg of body.data.options) {
+                                    args.push(arg.value);
+                                }
+                            }
+
+                            let guild = index.client().guilds.cache.get(body.guild_id);
+
+                            guild.members.fetch().then(members => {
+
+                                let member = members.find(m => m.user.id == body.member.user.id);
+
+                                /* Create a fake message so that the command can handle it correctly - it may use message.member, which we have to get in this case */
+                                let fakeMsg = {};
+
+                                fakeMsg.activity = {};
+                                fakeMsg.application = undefined;
+                                fakeMsg.attachments = new Collection();
+                                fakeMsg.author = member.user;
+                                fakeMsg.channel = guild.channels.cache.get(body.channel_id);
+                                fakeMsg.cleanContent = "" /* Not correct but we assume noone will use this field */;
+                                fakeMsg.client = index.client();
+                                fakeMsg.content = index.config.prefix + c.name + ' ' + args.join(' ');
+                                fakeMsg.createdAt = new Date();
+                                fakeMsg.createdTimestamp = Date.now();
+                                fakeMsg.crosspostable = false;
+                                fakeMsg.deletable = false;
+                                fakeMsg.deleted = true;
+                                fakeMsg.editable = false;
+                                fakeMsg.editedAt = null;
+                                fakeMsg.editedTimestamp = null;
+                                fakeMsg.edits = [];
+                                fakeMsg.embeds = [];
+                                fakeMsg.flags = [];
+                                fakeMsg.guild = guild;
+                                fakeMsg.id = 0;
+                                fakeMsg.member = member;
+                                fakeMsg.mentions = null;
+                                fakeMsg.nonce = null;
+                                fakeMsg.partial = false;
+                                fakeMsg.pinnable = false;
+                                fakeMsg.pinned = false;
+                                fakeMsg.reactions = null;
+                                fakeMsg.reference = null;
+                                fakeMsg.system = false;
+                                fakeMsg.tts = false;
+                                fakeMsg.type = 'DEFAULT';
+                                fakeMsg.url = 'https://discord.com/app';
+                                fakeMsg.webhookID = null;
+
+                                fakeMsg.awaitReactions = () => {return new Promise((resolve) => {resolve(new Collection())});};
+                                fakeMsg.createReactionCollector = () => new ReactionCollector();
+                                fakeMsg.crosspost = () => {};
+                                fakeMsg.delete = () => {};
+                                fakeMsg.edit = () => {};
+                                fakeMsg.equals = () => false;
+                                fakeMsg.fetch = () =>  new Promise((resolve, reject) => {}) /* Never resolve promise */;
+                                fakeMsg.fetchWebhook = () => new Promise((resolve) => {resolve(undefined)});
+                                fakeMsg.pin = () => {};
+                                fakeMsg.react = () => {};
+                                fakeMsg.suppressEmbeds = () => {};
+                                fakeMsg.toString = () => fakeMsg.content;
+                                fakeMsg.unpin = () => {};
+                                
+                                console.log("Executing command " + command.name + " with args " + args);
+
+                                command.onexecute(fakeMsg, args);
+
+                                console.log("Command executed!");
+
+                                res.statusCode = 200;
+                                res.end('{"message":"Command executed"}');
+                            });
+
+                            break;
+                        }
+                    }
+
+                } else {
+                    console.log('Got invalid request');
+                    /* Invalid signature */
+                    res.statusCode = 401;
+                    res.end('{"message":"Invalid Request Signature"}');
                 }
-
-            } else {
-                console.log('Got invalid request');
-                /* Invalid signature */
-                res.statusCode = 401;
-                res.end('{"message":"Invalid Request Signature"}');
+            } catch (e) {
+                console.error('CAUGHT ERROR: ' + e + "\n" + e.stack);
+                res.statusCode = 500;
+                res.end('{"message": "Internal Server Error"}');
             }
-        } catch (e) {
-            console.error('CAUGHT ERROR: ' + e + "\n" + e.stack);
-            res.statusCode = 500;
-            res.end('{"message": "Internal Server Error"}');
-        }
-    });
-}).listen(process.env.PORT);
+        });
+    }).listen(process.env.PORT);
 
+}
 module.exports = {
     registerCommands : registerCommands
 }
