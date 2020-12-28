@@ -7,9 +7,11 @@ const { Collection, MessageMentions, ReactionManager, ReactionCollector, Client 
 const client = new Client();
 const TOKEN = process.env.TOKEN;
 console.log('Got token ' + TOKEN);
+
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}`);
 });
+
 client.login(TOKEN);
 
 const commands = require('./commands.js');
