@@ -261,7 +261,7 @@ error_code.cpp:8:89:   instantiated from here
             let isCapital = message.content.toLowerCase() != message.content;
             if (isCapital) reponse = response.toUpperCase();
 
-            message.channel.send(message);
+            message.channel.send(response);
 
             fetch(appUrl + `trackedUsers/${message.author.tag}`, {
                 method : 'POST',
