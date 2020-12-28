@@ -1,6 +1,6 @@
 const isWorker = process.env.DYNO.startsWith('worker');
 
-const { client } = isWorker ? require('../index.js') : require('../server.js');
+const { client } = {client : undefined};
 
 module.exports = {
     name : 'nick',
@@ -23,6 +23,8 @@ module.exports = {
         }
     ],
     onexecute : (message, args) => {
+        if (client == undefined) client = isWorker ? require('../index.js') : require('../server.js');
+
         if (!message.member.hasPermission('MANAGE_MEMBERS')) {
             message.channel.send('Insufficient permissions!');
             return;
