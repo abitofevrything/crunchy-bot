@@ -1,4 +1,6 @@
-const { client } = require('../index.js');
+const isWorker = process.env.DYNO.startsWith('worker');
+
+const { client } = isWorker ? require('../index.js') : require('../server.js');
 
 module.exports = {
     name : 'nick',

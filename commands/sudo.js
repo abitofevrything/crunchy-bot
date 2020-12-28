@@ -1,4 +1,4 @@
-const {commands} = require('../index.js');
+let commands = undefined;
 const {prefix} = require('../config');
 
 module.exports = {
@@ -23,6 +23,8 @@ module.exports = {
         }
     ],
     onexecute: (message, args) => {
+        if (commands == undefined) commands = require('../commands.js');
+
         if (!message.member.hasPermission('MANAGE_GUILD')){
             message.channel.send('Insufficient permissions!');
             return;
@@ -79,7 +81,7 @@ module.exports = {
         }
         sudoMsg.unpin = message.unpin;
 
-        for (let command of commands().array()) {
+        for (let command of commands.array()) {
             if (command.name == sudoCommand || (command.aliases ? command.aliases.includes(sudoCommand) : false)) {
                 try {
                     command.onexecute(sudoMsg, sudoArgs);

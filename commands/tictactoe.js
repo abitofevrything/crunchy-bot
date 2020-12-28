@@ -1,5 +1,9 @@
 const { MessageEmbed } = require('discord.js');
-const index = require('../index.js');
+
+const isWorker = process.env.DYNO.startsWith('worker');
+
+const {client} = isWorker ? require('../index.js') : require('../server.js');
+const config = require('../config.js');
 
 const timeOutMillis = 30 * 60 * 1000;
 
@@ -44,22 +48,22 @@ function checkWin(board) {
 }
 
 function updateInvites() {
-    for (let gameStatus of index.client().ttt.values()) {
+    for (let gameStatus of client().ttt.values()) {
         if (gameStatus.status == 'pending' && gameStatus.timeSent - Date.now() > timeOutMillis) {
             let guildAndChannel = gameStatus.channel.split('/');
-            index.client().guilds.cache.find(guild => guild.id == guildAndChannel[0]).channels.cache.find(channel => channel.id == guildAndChannel[1]).send('<@' + gameStatus.player + ">, your request to play against <@" + gameStatus.opponent + "> has timed out.\nUse `" + index.config.prefix + "tictactoe @" + index.client().guilds.cache.find(guild => guild.id == guildAndChannel[0]).members.cache.find(member => member.id == gameStatus.opponent).displayName + "` to challenge them again.");
+            client().guilds.cache.find(guild => guild.id == guildAndChannel[0]).channels.cache.find(channel => channel.id == guildAndChannel[1]).send('<@' + gameStatus.player + ">, your request to play against <@" + gameStatus.opponent + "> has timed out.\nUse `" + config.prefix + "tictactoe @" + client().guilds.cache.find(guild => guild.id == guildAndChannel[0]).members.cache.find(member => member.id == gameStatus.opponent).displayName + "` to challenge them again.");
         }
     }
 }
 
 function getChannel(channelData) {
     let guildAndChannel = channelData.split('/');
-    return index.client().guilds.cache.get(guildAndChannel[0]).channels.cache.get(guildAndChannel[1]);
+    return client().guilds.cache.get(guildAndChannel[0]).channels.cache.get(guildAndChannel[1]);
 }
 
 function ensurePresent(member) {
     let id = member.id || member;
-    if (index.client().ttt.get(id) == undefined) {
+    if (client().ttt.get(id) == undefined) {
         setUserData(member, {
             status : 'notPlaying'
         });
@@ -69,12 +73,12 @@ function ensurePresent(member) {
 function getUserData(member) {
     ensurePresent(member);
     let id = member.id || member;
-    return index.client().ttt.get(id);
+    return client().ttt.get(id);
 }
 
 function setUserData(member, data) {
     let id = member.id || member;
-    index.client().ttt.set(id, data);
+    client().ttt.set(id, data);
 }
 
 function createEmbed(data, playerXName, playerOName) {
@@ -91,7 +95,7 @@ function createEmbed(data, playerXName, playerOName) {
     board += "┗━━━┻━━━┻━━━┛\n";
     board += "```";
     embed.addField("Board", board);
-    embed.setFooter("Use " + index.config.prefix + "tictactoe (1|2|3|4|5|6|7|8|9) to select where to play next.");
+    embed.setFooter("Use " + config.prefix + "tictactoe (1|2|3|4|5|6|7|8|9) to select where to play next.");
     return embed;
 }
 
@@ -202,7 +206,7 @@ module.exports = {
             let opponentData = getUserData(opponent);
             if (args[0] != 1 && args[0] != 2 && args[0] != 3 && args[0] != 4 && args[0] != 5 && args[0] != 6 && args[0] != 7 && args[0] != 8 &&  args[0] != 9) {
                 if ((message.mentions.members.first() || message.guild.members.cache.get(args[0])) != undefined) {
-                    message.channel.send(player.toString() + ", you are already in a game!\nCancel the game with `" + index.config.prefix + "tictactoe cancel` before challenging or accepting challenges.");
+                    message.channel.send(player.toString() + ", you are already in a game!\nCancel the game with `" + config.prefix + "tictactoe cancel` before challenging or accepting challenges.");
                     return;
                 }
                 message.channel.send(player.toString() + ", please select a valid position!");
@@ -313,10 +317,10 @@ module.exports = {
                         setTimeout(() => {
                             updateInvites();
                         }, timeOutMillis);
-                        message.channel.send(opponent.toString() + ", " + player.toString() + " has challenged you to a game of tic-tac-toe!\nUse `" + index.config.prefix + "tictactoe @" + player.displayName + "` to accept their invite!");
+                        message.channel.send(opponent.toString() + ", " + player.toString() + " has challenged you to a game of tic-tac-toe!\nUse `" + config.prefix + "tictactoe @" + player.displayName + "` to accept their invite!");
                     } else {
                         if (opponent.id != playerData.opponent) {
-                            message.channel.send("You have requested to play a game against <@" + playerData.opponent + ">.\nCancel the request with `" + index.config.prefix +"tictactoe cancel` before challenging someone else.");
+                            message.channel.send("You have requested to play a game against <@" + playerData.opponent + ">.\nCancel the request with `" + config.prefix +"tictactoe cancel` before challenging someone else.");
                             return;
                         }
                         playerData.timeSent = Date.now();

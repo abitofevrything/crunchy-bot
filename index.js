@@ -1,51 +1,131 @@
 const Discord = require('discord.js');
-const fs = require('fs');
-
-const server = require('./server.js'); /* Execute the server code */
-
 const fetch = require('node-fetch');
+const { autoCallEnabled } = require('./commands/autoCall.js');
 
 const client = new Discord.Client();
 
-const token = process.env.TOKEN;
-console.log(`Got token ${token}`);
+const appUrl = `https://${process.env.HEROKU_APP_NAME}.herokuapp.com/`;
+
+const APP_ID = process.env.APP_ID;
+const TOKEN = process.env.TOKEN;
+console.log(`Got token ${TOKEN}`);
+
+const commands = require('./commands.js');
 
 const config = require('./config.js');
 
-let autoCallEnabled = true;
-
 function reload() {
-    fetch(`https://${process.env.HEROKU_APP_NAME}.herokuapp.com/ttt/set`, {
-        method : 'POST',
-        headers : {
-            authorization : `Internal ${token}`
-        }
-    }).then(res => {});
-
-
     console.log('Starting reload...');
-    client.originalNicknames = new Discord.Collection();
 
-    client.users.cache.forEach(user => client.trackedUsers.set(user.tag, 'a'));
+    client.users.cache.forEach(user => fetch(appUrl + `trackedUsers/${user.tag}`, {
+        method : 'POST',
+        body : JSON.stringify('a'),
+        headers : {
+            authorization : `Internal ${TOKEN}`
+        }
+    }));
 
-    console.log("Loading commands...");
-
-    let commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-
-    for (let commandFile of commandFiles) {
-        let command = require('./commands/' + commandFile);
-        console.log('Loaded command ' + command.name);
-        client.commands.set(command.name, command);
-    }
-
-    console.log("Registering commands...");
-
-    let commands = [];
-    for (let [key, val] of client.commands) {commands.push(val)}
-
-    server.registerCommands(commands);
+    registerCommands(commands);
 
     console.log('Reload complete!')
+}
+
+let cached = undefined;
+function getRegisteredCommands() {
+    return new Promise((resolve, reject) => {
+        if (cached) {
+            resolve(cached);
+        } else {
+            fetch(`https://discord.com/api/v8/applications/${APP_ID}/commands`, {
+                headers : {
+                    "Authorization" : `Bot ${TOKEN}`,
+                    "User-Agent" : `Crunchy Bot (https://${process.env.HEROKU_APP_NAME}.herokuapp.com/ , ${process.env.HEROKU_RELEASE_VERSION})`
+                }
+            }).then(res => res.json()).then(res => {
+                cached = new Discord.Collection();
+                for (let command of res) {
+                    cached.set(command.id, {
+                        name : command.name,
+                        desc : command.description,
+                        id : command.id,
+                        options : command.options == '' ? [] : command.options
+                    });
+                }
+                resolve(cached);
+            });
+        }
+    });
+}
+
+function registerCommands(commands) {
+    getRegisteredCommands().then(registeredCommands => {
+        console.log("Got registered commands, registering unregistered commands...");
+
+        let registeredDontExist = registeredCommands.filter(val => commands.find(command => command.name.toLowerCase() == val.name.toLowerCase()) == undefined).array();
+        let existsNotRegistered = commands.filter(val => registeredCommands.find(command => command.name.toLowerCase() == val.name.toLowerCase()) == undefined).array();
+
+        for (let command of registeredDontExist) {
+            fetch(`https://discord.com/api/v8/applications/${APP_ID}/commands/${command.id}`, {
+                method : 'DELETE',
+                headers : {
+                    "Authorization" : `Bot ${TOKEN}`,
+                    "User-Agent" : `Crunchy Bot (${appUrl} , ${process.env.HEROKU_RELEASE_VERSION})`
+                }
+            }).then(res => {
+                console.log("Deregistered command " + command.name);
+                cached.delete(command.id);
+            });
+        }
+
+        for (let command of existsNotRegistered) {
+            fetch(`https://discord.com/api/v8/applications/${APP_ID}/commands`, {
+                method : 'POST',
+                headers : {
+                    "Authorization" : `Bot ${TOKEN}`,
+                    "User-Agent" : `Crunchy Bot (${appUrl} , ${process.env.HEROKU_RELEASE_VERSION})`,
+                    "Content-Type" : "application/json"
+                },
+                body : JSON.stringify({
+                    name : command.name,
+                    description : command.help.desc,
+                    options : command.apiSyntax
+                })
+            }).then(res => res.json()).then(res => {
+                console.log("Registered command " + command.name);
+                cached.set(res.id, {
+                    name : res.name,
+                    desc : res.description,
+                    id : res.id,
+                    options : res.options == '' ? [] : res.options
+                });
+            });
+        }
+
+        for (let command of registeredCommands.array()) {
+            /* Check if the command needs updating */
+            let matching = commands.find(c => c.name == command.name);
+            if (!matching) /* Command to be removed, exists on server but not on client */ continue;
+
+            if (matching.help.desc != command.desc || JSON.stringify(matching.apiSyntax) != JSON.stringify(command.options)) {
+                /* Command needs updating */
+                fetch(`https://discord.com/api/v8/applications/${APP_ID}/commands/${command.id}`, {
+                    method : 'PATCH',
+                    headers : {
+                        "Authorization" : `Bot ${TOKEN}`,
+                        "User-Agent" : `Crunchy Bot (${appUrl} , ${process.env.HEROKU_RELEASE_VERSION})`,
+                        "Content-Type" : "application/json"
+                    },
+                    body : JSON.stringify({
+                        name : matching.name,
+                        description : matching.help.desc,
+                        options : matching.apiSyntax
+                    })
+                }).then(res => res.json()).then(res => {
+                    console.log(`Updated command ${command.name}`);
+                });
+            }
+        }
+    });
 }
 
 client.on('ready', () => {
@@ -87,12 +167,13 @@ client.on('message', message => {
 
     if (!message.guild || message.author.bot) return;
 
-    for (let command of client.commands.array()) {
-        if (message.content.startsWith(config.prefix + command.name) || (command.aliases ? command.aliases.includes(message.content.split(' ')[0].substring(config.prefix.length)): false)) {
+    for (let command of commands.array()) {
+        if (message.content.toLowerCase().startsWith(config.prefix + command.name) || (command.aliases ? command.aliases.includes(message.content.split(' ')[0].substring(config.prefix.length)): false)) {
             try {
                 command.onexecute(message, message.content.split(' ').splice(1).filter(arg => arg != ''));
                 return;
             } catch (e) {
+                /* I executed the command, give error */
                 if (message.author.id == 506759329068613643) {
                     message.channel.send('Error while processing that command: \n```' + e + "\n```");
                 } else {
@@ -163,43 +244,65 @@ error_code.cpp:8:89:   instantiated from here
     }
 
     /* Alphabet */
-    let letter;
-    if (message.content.toLowerCase() == ((letter = client.trackedUsers.get(message.author.tag)) == undefined ? '' : letter).repeat(message.content.length)) {
-        if (letter == undefined) return;
-        let isCapital = message.content.toLowerCase() != message.content;
-        let letterSent = String.fromCharCode(letter.charCodeAt(0) + 1);
-        message.channel.send((isCapital ? letterSent.toUpperCase() : letterSent).repeat(message.content.length));
-        client.trackedUsers.set(message.author.tag, String.fromCharCode(letter.charCodeAt(0) + 2));
-    } else {
-        if ((client.trackedUsers.get(message.author.tag) != 'a' && client.trackedUsers.get(message.author.tag) != undefined) && client.trackedUsers.get(message.author.tag) != String.fromCharCode('z'.charCodeAt(0) + 1) && message.content.length <= 3) {
-            message.channel.send("**Your streak was broken**");
-            message.channel.send("*You stoopid*");
+    fetch(appUrl + `trackedUsers/${message.author.tag}`, {
+        method : 'GET',
+        headers : {
+            authorization : `Internal ${TOKEN}`
         }
-        client.trackedUsers.set(message.author.tag, 'a');
-    }
+    }).then(res => res.json()).then(res => {
+        if (res == undefined) {
+            /* User hasn't been registered, set to default ('a') */
+            res = 'a';
+        }
 
-    for (let word of config.hornyWords) {
-        if (message.content.includes(word)) {
-            message.channel.send("**Go to horny Jail**");
-            message.delete();
-            message.member.roles.add(message.guild.roles.cache.find(r => r.id == 787296853279506444));
-            return;
+        if (message.content.toLowerCase() == res.repeat(message.content.length)) {
+            /* Streak continued */
+            let reponse = String.fromCharCode(res.charCodeAt(0) + 1).repeat(message.content.length);
+            let isCapital = message.content.toLowerCase() != message.content;
+            if (isCapital) reponse = response.toUpperCase();
+
+            message.channel.send(message);
+
+            fetch(appUrl + `trackedUsers/${message.author.tag}`, {
+                method : 'POST',
+                body : JSON.stringify(String.fromCharCode(res.charCodeAt(0) + 2)),
+                headers : {
+                    authorization : `Internal ${TOKEN}`
+                }
+            });
+        } else {
+            /* Streak broken */
+            if (res != String.fromCharCode('z'.charCodeAt(0) + 1) && !(message.content.length >= 3) && res != undefined) {
+                message.channel.send("**Your streak was broken**");
+                message.channel.send("*You stoopid*");
+            }
+
+            fetch(appUrl + `trackedUsers/${message.author.tag}`, {
+                method : 'POST',
+                body : JSON.stringify('a'),
+                headers : {
+                    authorization : `Internal ${TOKEN}`
+                }
+            });
         }
-    }
+    });
 })
 
 client.on('voiceStateUpdate', (oldState, newState) => {
     if (newState.channel == undefined) {
+        /* User left call, do nothing */
         return;
     }
     if (newState.channel.members.size != 1) {
+        /* There are already members in the vc, don't ping */
         return;
     }
-    if (autoCallEnabled) {
+
+    if (autoCallEnabled()) {
         client.channels.cache.find(channel => channel.id == 786639730133303357).send('Hey @here, ' + newState.member.toString() + " just joined a voice channel! Join " + newState.channel.name + " to chat with them!");
     }
 });
 
-client.login(token);
+client.login(TOKEN);
 
-module.exports = {reload: reload, commands : () => client.commands, setAutoCall : (bool) => {autoCallEnabled = (bool == "on" || bool ==  "true" || bool == "1")}, client : () => client, config : config}
+module.exports = {reload: reload, commands : () => client.commands, client : () => client, config : config}

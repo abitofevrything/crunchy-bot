@@ -1,4 +1,7 @@
-const {setAutoCall} = require('../index.js');
+let autoCallEnabled = true;
+
+let setAutoCall = (bool) => {autoCallEnabled = (bool == "on" || bool ==  "true" || bool == "1")};
+
 module.exports = {
     name : "autoCall",
     help : {
@@ -29,5 +32,6 @@ module.exports = {
         }
         setAutoCall(args[0]);
         message.channel.send('Set autoCall status to ' + args[0]);
-    }
+    },
+    autoCallEnabled: () => autoCallEnabled
 }
