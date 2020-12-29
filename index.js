@@ -179,7 +179,7 @@ client.on('message', message => {
                 } else {
                     message.channel.send(`${message.author.toString()}, there was an internal error while processing that command.`);
                 }
-                console.error(e);
+                console.error(`Error executing command ${command.name} from user ${message.member.displayName} : ${e}\n${e.stack}`);
             }
         }
     }
