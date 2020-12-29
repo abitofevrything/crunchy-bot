@@ -56,10 +56,12 @@ http.createServer((req, res) => {
 
                 if (req.method == 'GET' || req.method == '' || req.method == undefined) {
                     res.statusCode = 200;
-                    res.end(JSON.stringify(storage[target[0]].get(target[1])));
+                    let resp;
+                    res.end((resp = JSON.stringify(storage[target[0]].get(target[1]))) == undefined ? '{}' : resp);
                 } else {
                     res.statusCode = 200;
-                    res.end(JSON.stringify(storage[target[0]].set(target[1], body)));
+                    let resp;
+                    res.end((resp = JSON.stringify(storage[target[0]].set(target[1], body))) == undefined ? '{}' : resp);
                 }
 
                 return;

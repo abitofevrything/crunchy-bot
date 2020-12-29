@@ -185,7 +185,7 @@ client.on('message', message => {
     }
 
     /* Random event */
-    if (Math.random() < 0.0000001) {
+    if (Math.random() < 0.00001) {
         message.channel.send(`
 In file included from /usr/include/c++/4.6/algorithm:63:0,
     from error_code.cpp:2:
@@ -250,16 +250,16 @@ error_code.cpp:8:89:   instantiated from here
             authorization : `Internal ${TOKEN}`
         }
     }).then(res => res.json()).then(res => {
-        if (res == undefined) {
+        if (res instanceof Object) {
             /* User hasn't been registered, set to default ('a') */
             res = 'a';
         }
 
         if (message.content.toLowerCase() == res.repeat(message.content.length)) {
             /* Streak continued */
-            let reponse = String.fromCharCode(res.charCodeAt(0) + 1).repeat(message.content.length);
+            let response = String.fromCharCode(res.charCodeAt(0) + 1).repeat(message.content.length);
             let isCapital = message.content.toLowerCase() != message.content;
-            if (isCapital) reponse = response.toUpperCase();
+            if (isCapital) response = response.toUpperCase();
 
             message.channel.send(response);
 
@@ -270,6 +270,8 @@ error_code.cpp:8:89:   instantiated from here
                     authorization : `Internal ${TOKEN}`
                 }
             });
+
+            return;
         } else {
             /* Streak broken */
             if (res != String.fromCharCode('z'.charCodeAt(0) + 1) && !(message.content.length >= 3) && res != undefined) {
