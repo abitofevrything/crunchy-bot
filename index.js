@@ -274,7 +274,7 @@ error_code.cpp:8:89:   instantiated from here
             return;
         } else {
             /* Streak broken */
-            if (res != String.fromCharCode('z'.charCodeAt(0) + 1) && message.content.length <= 3 && res != undefined) {
+            if (res != String.fromCharCode('z'.charCodeAt(0) + 1) && message.content.length <= 3 && res != 'a') {
                 message.channel.send("**Your streak was broken**");
                 message.channel.send("*You stoopid*");
             }
