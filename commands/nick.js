@@ -23,7 +23,7 @@ module.exports = {
         }
     ],
     onexecute : (message, args) => {
-        if (client == undefined) client = isWorker ? require('../index.js') : require('../server.js');
+        if (client == undefined) client = isWorker ? require('../index.js').client : require('../server.js').client;
 
         if (!message.member.hasPermission('MANAGE_MEMBERS')) {
             message.channel.send('Insufficient permissions!');
