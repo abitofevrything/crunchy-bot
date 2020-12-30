@@ -14,6 +14,12 @@ const commands = require('./commands.js');
 
 const config = require('./config.js');
 
+setInterval(() => {
+    console.log('Maintain active process');
+    /* Activity will keep this thread from sleeping, ping the other one as well */
+    fetch(appUrl + 'trackedUsers/');
+}, 600000);
+
 function reload() {
     console.log('Starting reload...');
 
