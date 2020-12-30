@@ -306,6 +306,11 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         return;
     }
 
+    if (newState.channel == oldState.channel) {
+        /* User muted / deafened while alone in vc */
+        return;
+    }
+
     if (autoCallEnabled()) {
         client.channels.cache.find(channel => channel.id == 786639730133303357).send('Hey @here, ' + newState.member.toString() + " just joined a voice channel! Join " + newState.channel.name + " to chat with them!");
     }
