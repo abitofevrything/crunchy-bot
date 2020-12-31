@@ -23,7 +23,7 @@ module.exports = {
         let dateTime;
         if ((dateTime = Date.parse(args[0])) != NaN) {
             time = dateTime - Date.now();
-            console.log('Got time as date : calculated delta : ' + time);
+            console.log('Got time as date : calculated delta : ' + time + ', parsed time was ' + dateTime);
         } else {
             if (time.endsWith('ms')) time = parseInt(time.replace('ms', ''));
             if (time.endsWith('s')) time = parseFloat(time.replace('s', '')) * 1000;
