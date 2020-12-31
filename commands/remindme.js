@@ -23,6 +23,7 @@ module.exports = {
         let dateTime;
         if ((dateTime = Date.parse(args[0])) != NaN) {
             time = dateTime - Date.now();
+            console.log('Got time as date : calculated delta : ' + time);
         } else {
             if (time.endsWith('ms')) time = parseInt(time.replace('ms', ''));
             if (time.endsWith('s')) time = parseFloat(time.replace('s', '')) * 1000;
@@ -30,7 +31,7 @@ module.exports = {
             if (time.endsWith('h')) time = parseFloat(time.replace('h', '')) * 60000 * 60;
             if (time.endsWith('d')) time = parseFloat(time.replace('d', '')) * 60000 * 60 * 24;
 
-            console.log(time);
+            console.log('Got time as delay: ' + time);
 
             if (parseInt(time) == NaN || time == NaN) return message.channel.send('Please input a valid time.');
         }
