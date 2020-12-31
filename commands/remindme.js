@@ -22,7 +22,6 @@ module.exports = {
         
         let dateTime;
         if ((dateTime = Date.parse(args[0])) != NaN) {
-            console.log('Arg was a date');
             time = dateTime - Date.now();
         } else {
             if (time.endsWith('ms')) time = parseInt(time.replace('ms', ''));
@@ -31,6 +30,7 @@ module.exports = {
             if (time.endsWith('h')) time = parseFloat(time.replace('h', '')) * 60000 * 60;
             if (time.endsWith('d')) time = parseFloat(time.replace('d', '')) * 60000 * 60 * 24;
 
+            console.log(time);
 
             if (parseInt(time) == NaN || time == NaN) return message.channel.send('Please input a valid time.');
         }
