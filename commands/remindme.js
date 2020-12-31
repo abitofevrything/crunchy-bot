@@ -24,7 +24,7 @@ module.exports = {
         if ((dateTime = Date.parse(args[0])) != NaN) {
             time = dateTime - Date.now();
         } else {
-            if (time.endsWith('ms')) time = time.replace('ms', '');
+            if (time.endsWith('ms')) time = parseInt(time.replace('ms', ''));
             if (time.endsWith('s')) time = parseFloat(time.replace('s', '')) * 1000;
             if (time.endsWith('m')) time = parseFloat(time.replace('m', '')) * 60000;
             if (time.endsWith('h')) time = parseFloat(time.replace('h', '')) * 60000 * 60;
@@ -34,7 +34,7 @@ module.exports = {
             if (parseInt(time) = NaN) return message.channel.send('Please input a valid time.');
         }
 
-        message.channel.send(`I will remind you of this on ${new Date(/*Date.now() + time*/ 0).toLocaleString()} (If I am not restarted)`);
+        message.channel.send(`I will remind you of this on ${new Date(Date.now() + time).toLocaleString()} (If I am not restarted)`);
 
         setTimeout(() => {
             message.channel.send(`Hey ${message.member.toString()}, you wanted me to remind you of this : \`\`\`${args.splice(1).join(' ')}\`\`\``);
