@@ -34,7 +34,9 @@ module.exports = {
             if (parseInt(time) = NaN) return message.channel.send('Please input a valid time.');
         }
 
-        message.channel.send(`I will remind you of this on ${new Date(Date.now() + time).toLocaleString()} (If I am not restarted)`);
+        console.log(time);
+
+        message.channel.send(`I will remind you of this on ${new Date(Date.now() + time).toLocaleString()} GMT (If I am not restarted)`);
 
         setTimeout(() => {
             message.channel.send(`Hey ${message.member.toString()}, you wanted me to remind you of this : \`\`\`${args.splice(1).join(' ')}\`\`\``);
