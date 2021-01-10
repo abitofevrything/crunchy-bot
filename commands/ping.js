@@ -5,6 +5,7 @@ module.exports = {
         syntax : 'ping'
     },
     apiSyntax : [],
+    aliases : ['p'],
     onexecute : (message, args) => {
         if (message.author.id == message.client.user.id) {
             message.channel.send('po- hold on, why am I talking to myself?');
