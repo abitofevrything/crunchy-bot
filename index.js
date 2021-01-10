@@ -174,7 +174,7 @@ client.on('message', message => {
     if (!message.guild || message.author.bot) return;
 
     for (let command of commands.array()) {
-        if (message.content.toLowerCase().startsWith(config.prefix + command.name) || (command.aliases ? command.aliases.includes(message.content.split(' ')[0].substring(config.prefix.length)): false)) {
+        if (message.content.toLowerCase().startsWith(config.prefix + command.name) || ((command.aliases ? command.aliases.includes(message.content.split(' ')[0].substring(config.prefix.length)): false) && message.content.startsWith(config.prefix))) {
             try {
                 command.onexecute(message, message.content.split(' ').splice(1).filter(arg => arg != ''));
                 return;
