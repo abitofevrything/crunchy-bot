@@ -133,6 +133,24 @@ client.on('message', message => {
 			alphabet : alphabet
 		});
 	}
+
+	if (message.content == "69" || message.content == "420") message.channel.send('*Nice.*');
+
+	if (
+		message.content.toLowerCase().includes("what is karlson") ||
+		message.content.toLowerCase().includes("whats karlson") ||
+		message.content.toLowerCase().includes("what's karlson") ||
+		message.content.toLowerCase().includes("what karlson") ||
+		message.content.toLowerCase().includes("what is karlsson") ||
+		message.content.toLowerCase().includes("whats karlsson") ||
+		message.content.toLowerCase().includes("what's karlsson") ||
+		message.content.toLowerCase().includes("whats carlson") ||
+		message.content.toLowerCase().includes("what's carlson")
+	) {
+		message.channel.send(
+			"karlson is a game i'm working on by the way which you can whishlist on steam i'm just saying we're currently the 17th most wishlisted game in the world so let's get to number one baby".split('').map(l => Math.random() < 0.5 ? l:l.toUpperCase()).join('')
+		);
+	}
 });
 
 client.on('voiceStateUpdate', (oldState, newState) => {
