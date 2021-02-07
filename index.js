@@ -94,7 +94,7 @@ client.on('message', message => {
 		let firstWord = split[0].substring(1), args = split.splice(1);
 
 		for (let [,command] of client.commands) {
-			if (firstWord == command.name || command.aliases?.includes(firstWord)) {
+			if (firstWord.toLowerCase() == command.name || command.aliases?.includes(firstWord.toLowerCase())) {
 				command.onexecute(message, args, message.guild, client);
 				break;
 			}
