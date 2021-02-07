@@ -122,7 +122,7 @@ client.on('message', message => {
 			});
 		}
 	} else {
-		if (message.content.length > 3 && current != 'a') {
+		if (message.content.length < 3 && current != 'a' && current != undefined) {
 			message.channel.send('**Your streak was broken**\n*You stoopid*');
 		}
 
@@ -151,10 +151,10 @@ client.on('voiceStateUpdate', (oldState, newState) => {
 });
 
 /* Cycling status */
-let index = 0;
+let index = 0, oneOverHour = 60;
 setInterval(() => {
 	index++;
-	if (index == 12) {
+	if (index == oneOverHour) {
 		index = 0;
 		client.user.setActivity({
 			type : 'LISTENING',
@@ -166,7 +166,7 @@ setInterval(() => {
 			name : 'your every move'
 		});
 	}
-}, 300000);
+}, 60 * 60 * 1000 / oneOverHour);
 
 client.login(TOKEN);
 
