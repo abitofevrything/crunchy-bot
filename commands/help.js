@@ -2,6 +2,11 @@ const { MessageEmbed } = require("discord.js");
 let commands = undefined;
 const { prefix } = require('../config.js');
 
+for (let file of fs.readdirSync('../commands').filter(f => f.endsWith('.js')).filter(f => f != 'help.js')) {
+	const command = require(file);
+	commands.set(command.name, command);
+}
+
 module.exports = {
     name: "help",
     aliases: ["hlep"],
@@ -15,9 +20,6 @@ module.exports = {
         description : 'The command you want help with'
     }],
     onexecute : (message, args) => {
-        /* Avoid circular require() */
-        if (commands == undefined) commands = require('../commands.js');
-
         if (args.length == 0) {
             let embed = new MessageEmbed().setTitle('Help');
             embed.addField('Commands', '```' + commands.array().reduce((acc, curr, index, arr) => acc + (prefix + curr.name) + (index == arr.length - 1 ? '' : '\n'), '') + '```');
@@ -38,3 +40,5 @@ module.exports = {
         }
     }
 }
+
+commands.set('help', module.exports);
