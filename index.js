@@ -48,7 +48,7 @@ client.on('ready', () => {
 
 	const guilds = client.guilds.cache;
 	for (let [,guild] of guilds) {
-		guild.members.cache.find(m => m.user.id == client.user.id).setNickname(`Crunchy Bot ${process.env.HEROKU_APP_VERSION}`);
+		guild.members.cache.find(m => m.user.id == client.user.id).setNickname(`Crunchy Bot ${process.env.HEROKU_RELEASE_VERSION}`);
 		guildData.merge(guild.id, {
 			alphabet : {},
 			callNotifs : true
