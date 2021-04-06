@@ -1,5 +1,3 @@
-const isWorker = process.env.DYNO.startsWith('worker');
-
 let { client } = {client : undefined};
 
 module.exports = {

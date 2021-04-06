@@ -1,5 +1,4 @@
 const { MessageEmbed } = require("discord.js");
-let commands = undefined;
 const { prefix } = require('../config.js');
 
 module.exports = {
@@ -14,16 +13,13 @@ module.exports = {
         name : 'command',
         description : 'The command you want help with'
     }],
-    onexecute : (message, args) => {
-        /* Avoid circular require() */
-        if (commands == undefined) commands = require('../commands.js');
-
+    onexecute : (message, args, guild, client) => {
         if (args.length == 0) {
             let embed = new MessageEmbed().setTitle('Help');
-            embed.addField('Commands', '```' + commands.array().reduce((acc, curr, index, arr) => acc + (prefix + curr.name) + (index == arr.length - 1 ? '' : '\n'), '') + '```');
+            embed.addField('Commands', '```' + client.commands.array().reduce((acc, curr, index, arr) => acc + (prefix + curr.name) + (index == arr.length - 1 ? '' : '\n'), '') + '```');
             message.channel.send(embed);
         } else {
-            let command = commands.find(command => command.name == args[0] || prefix + command.name == args[0]);
+            let command = client.commands.find(command => command.name == args[0] || prefix + command.name == args[0]);
             if (command == undefined) {
                 message.channel.send('Unable to find command ' + args[0]);
                 return;

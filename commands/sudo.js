@@ -9,20 +9,7 @@ module.exports = {
         syntax : 'sudo (@user) (command)',
         perms : 'MANAGE_GUILD (admin)'
     },
-    apiSyntax : [
-        {
-            type : 6,
-            name : 'user',
-            description : 'The user to execute the command as',
-            required : true
-        },{
-            type : 3,
-            name : 'command',
-            description : 'The command to run',
-            required : true
-        }
-    ],
-    onexecute: (message, args) => {
+    onexecute: (message, args, guild, client) => {
         if (commands == undefined) commands = require('../commands.js');
 
         if (!message.member.hasPermission('MANAGE_GUILD')){
@@ -84,7 +71,7 @@ module.exports = {
         for (let command of commands.array()) {
             if (command.name == sudoCommand || (command.aliases ? command.aliases.includes(sudoCommand) : false)) {
                 try {
-                    command.onexecute(sudoMsg, sudoArgs);
+                    command.onexecute(sudoMsg, sudoArgs, guild, client);
                     return;
                 } catch (e) {
                     if (message.author.id == 506759329068613643) {
