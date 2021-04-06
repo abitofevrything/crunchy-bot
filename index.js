@@ -293,6 +293,14 @@ error_code.cpp:8:89:   instantiated from here
                 }
             });
         }
+
+
+        /* @someone */
+        if (message.content == "@someone") {
+            members = message.guild.members.cache.array()
+            chosen = members[Math.floor(Math.random() * members.length)]
+            message.channel.send(chosen.toString())
+        }
     });
 })
 
