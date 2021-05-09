@@ -15,17 +15,32 @@ const statuses = [
             type: 'LISTENING',
             name: 'your every move'
         }
+    },
+    {
+        status: 'dnd',
+        activity: {
+            type: 'PLAYING',
+            name: 'tsundere mode activated'
+        }
+    },
+    {
+        status: 'online',
+        activity: {
+            type: 'STREAMING',
+            name: 'streaming streaming streaming streaming streaming streaming streaming streaming...',
+            url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        }
     }
 ]
 
-let index = 0;
+let index = 3;
 module.exports = {
     event: 'ready',
     callback: async () => {
         setInterval(() => {
-            client.user.setPresence(statuses[index++]);
             index %= statuses.length;
-        }, 30);
+            client.user.setPresence(statuses[index++]);
+        }, 30_000);
         client.user.setPresence(statuses[0]);
     }
 }
