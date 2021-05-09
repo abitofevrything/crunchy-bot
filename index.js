@@ -76,7 +76,7 @@ for (let file of fs.readdirSync(path.join(__dirname, 'listeners'))) {
 
     client.on(listener.event, listener.callback);
 
-    console.log(`Loaded listener '${listener.event}'`);
+    console.log(`Loaded listener '${listener.event}' (${file})`);
 }
 
 // Login
