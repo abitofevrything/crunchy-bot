@@ -105,7 +105,7 @@ module.exports = class ConfigCommand extends Commando.Command {
         super(client, {
             name: 'config',
             aliases: ['cfg', 'settings', 'configure'],
-            group: group.name,
+            group: group.id,
             memberName: 'config',
             description: "Set up or change bot settings on this server",
             details: "This command allows you to change the bot settings for this server. It can only be used by server administrators.",
