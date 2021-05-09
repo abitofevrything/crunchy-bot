@@ -51,6 +51,7 @@ module.exports.db = db;
 
 // Load commands
 client.registry.registerDefaults();
+client.registry.unknownCommand = null;
 
 const fs = require('fs');
 const path = require('path');
