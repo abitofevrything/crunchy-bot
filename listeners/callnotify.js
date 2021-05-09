@@ -20,7 +20,11 @@ module.exports = {
                 let guild = await client.guilds.fetch(newState.guild.id);
                 if (!guild) return;
 
-                let role = await guild.roles.fetch(row["callnotify_role_id"]);
+                let role;
+                if (row["callnotify_role_id"] == 'everyone') role = '@everyone';
+                else if (row["callnotify_role_id"] == 'here') role = '@here';
+                else role = await guild.roles.fetch(row["callnotify_role_id"]);
+                
                 let channel = guild.channels.cache.get(row["callnotify_channel"]);
 
                 if (role && channel && channel.send) {

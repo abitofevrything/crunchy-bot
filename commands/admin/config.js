@@ -47,6 +47,9 @@ function getSetting(msg, title, description, colour, options) {
 function getRole(msg) {
     let id;
 
+    if (/@everyone/.test(msg) || msg.content == 'everyone') return 'everyone';
+    if (/@here/.test(msg) || msg.content == 'here') return 'here';
+
     if (msg.mentions.roles.first()) {
         id = msg.mentions.roles.first().id;
     } else if (msg.guild.roles.cache.get(msg.content)) {
@@ -187,7 +190,7 @@ module.exports = class ConfigCommand extends Commando.Command {
                         } while (cn_channel_id == undefined);
                     }
                 } while ((await getSetting(msg, 'Call notifs', (cn_enabled ? 
-                    `Call notifications are enabled. They will ping <@&${cn_role_id}> in <#${cn_channel_id}>. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section.` : 
+                    `Call notifications are enabled. They will ping ${cn_role_id == 'here' || cn_role_id == 'everyone' ? '@' + cn_role_id : '<@&' + cn_role_id + '>'} in <#${cn_channel_id}>. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section.` : 
                     "Call notifications are disabled. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section."
                 ), pastelOrange, ['yes', 'no'])).content != 'yes');
             }
