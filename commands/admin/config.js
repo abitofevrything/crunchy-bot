@@ -7,7 +7,8 @@ const group = require('./index.js');
 const pastelGreen = '#44eb52', pastelRed = '#eb4444', pastelOrange = '#f0a52e', pastelBlue = '#4795d1';
 
 const allSections = [
-    'call_notifs'
+    'call_notifs',
+    'alphabet'
 ];
 
 function getSetting(msg, title, description, colour, options) {
@@ -44,24 +45,25 @@ function getSetting(msg, title, description, colour, options) {
     });
 }
 
-function getRole(msg) {
+function getRole(msg, search) {
     let id;
-    msg.content = msg.content.trim();
-    
-    if (/@everyone/.test(msg) || msg.content == 'everyone') return 'everyone';
-    if (/@here/.test(msg) || msg.content == 'here') return 'here';
+    if (!search) search = msg.content;
+    search = search.trim();
+
+    if (/@everyone/.test(search) || search == 'everyone') return 'everyone';
+    if (/@here/.test(search) || search == 'here') return 'here';
 
     if (msg.mentions.roles.first()) {
         id = msg.mentions.roles.first().id;
-    } else if (msg.guild.roles.cache.get(msg.content)) {
-        id = msg.guild.roles.cache.get(msg.content).id;
+    } else if (msg.guild.roles.cache.get(search)) {
+        id = msg.guild.roles.cache.get(search).id;
     } else {
 
         let match, ambiguous = false;
         for (let role of msg.guild.roles.cache.array()) {
-            if (role.name == msg.content) {
+            if (role.name == search) {
                 match = role;
-            } else if (role.name.includes(msg.content)) {
+            } else if (role.name.includes(search)) {
                 ambiguous = !!match;
                 match = role;
             }
@@ -76,21 +78,22 @@ function getRole(msg) {
     return id;
 }
 
-function getChannel(msg) {
+function getChannel(msg, search) {
     let id;
-    msg.content = msg.content.trim();
+    if (!search) search = msg.content;
+    search = search.trim();
 
-    if (/(?<=<#)[0-9]{17,19}(?=>)/.test(msg.content)) {
-        id = msg.guild.channels.cache.get(/(?<=<#)[0-9]{17,19}(?=>)/.exec(msg.content)[0]).id;
-    } else if (msg.guild.channels.cache.get(msg.content) && msg.guild.channels.cache.get(msg.content).type == 'text') {
-        id = msg.guild.channels.cache.get(msg.content).id;
+    if (/(?<=<#)[0-9]{17,19}(?=>)/.test(search)) {
+        id = msg.guild.channels.cache.get(/(?<=<#)[0-9]{17,19}(?=>)/.exec(search)[0]).id;
+    } else if (msg.guild.channels.cache.get(search) && msg.guild.channels.cache.get(search).type == 'text') {
+        id = msg.guild.channels.cache.get(search).id;
     } else {
 
         let match, ambiguous = false;
         for (let channel of msg.guild.channels.cache.array().filter(c => c.type == 'text')) {
-            if (channel.name == msg.content) {
+            if (channel.name == search) {
                 match = channel;
-            } else if (channel.name.includes(msg.content)) {
+            } else if (channel.name.includes(search)) {
                 ambiguous = !!match;
                 match = channel;
             }
@@ -214,21 +217,68 @@ module.exports = class ConfigCommand extends Commando.Command {
                 ), pastelOrange, ['yes', 'no'])).content != 'yes');
             }
 
-            db.all(`
-                UPDATE guilds SET
-                    callnotify_enabled = $cn_enabled,
-                    callnotify_role_id = $cn_role_id,
-                    callnotify_channel = $cn_channel_id
-                WHERE id = $guild_id
-            `, {
-                $guild_id: msg.guild.id,
+            // Section 2: alphabet
+            let alphabet_channels, split_channels;
+            if (sections.includes('alphabet')) {
+                do {
+                    let alphabet_enabled_message = await getSetting(msg, 'Alphabet', "Reply with 'yes' to enable alphabet or with 'no' to disable it.\nIf you select yes, you will be able to configure which channels it is enabled in.", pastelBlue, ['yes', 'no']);
+                    if (alphabet_enabled_message.content == 'no') alphabet_channels = '-';
 
-                $cn_enabled: cn_enabled ? 1 : 0,
-                $cn_role_id: cn_role_id,
-                $cn_channel_id: cn_channel_id
-            }, (err, _) => {
-                if (err) throw err;
-            });
+                    if (alphabet_channels != '-') {
+                        let alphabet_channels_message = await getSetting(msg, 'Alphabet', "Reply with a comma-separated list of channel links, names or ids to enable alphabet in. If you want alphabet to be enabled globally, reply with 'all' or '*'.", pastelBlue);
+                        let content = alphabet_channels_message.content.trim();
+
+                        if (content.trim() == 'all' || content.trim() == '*') {
+                            alphabet_channels = '*';
+                        } else {
+                            split_channels = content.split(',').map(c => getChannel(msg, c)).filter(Boolean);
+                            alphabet_channels = split_channels.join(',');
+                        }
+                    }
+
+                } while ((await getSetting(msg, 'Alphabet', (alphabet_channels == '-' ?
+                    "Alphabet will be disabled. Is this correct? Replay with 'yes' to continue or with 'no' to redo this section." :
+                    (alphabet_channels == '*' ?
+                        "Alphabet will be enabled in all channels. Is this correct? Replay with 'yes' to continue or with 'no' to redo this section." :
+                        `Alphabet will be enabled in the following channel${(split_channels.length == 1 ?
+                            ': <#' + split_channels[0] + '>' :
+                            's: <#' + split_channels.slice(0, split_channels.length - 1).join('>, <#') + '> and <#' + split_channels[split_channels.length - 1] + '>'
+                        )}. Is this correct? Replay with 'yes' to continue or with 'no' to redo this section.`
+                    )
+                ), pastelOrange, ['yes', 'no'])).content != 'yes');
+            }
+
+            if (cn_enabled !== undefined) {
+                db.all(`
+                    UPDATE guilds SET
+                        callnotify_enabled = $cn_enabled,
+                        callnotify_role_id = $cn_role_id,
+                        callnotify_channel = $cn_channel_id
+                    WHERE id = $guild_id
+                `, {
+                    $guild_id: msg.guild.id,
+
+                    $cn_enabled: cn_enabled ? 1 : 0,
+                    $cn_role_id: cn_role_id,
+                    $cn_channel_id: cn_channel_id
+                }, (err, _) => {
+                    if (err) throw err;
+                });
+            }
+
+            if (alphabet_channels !== undefined) {
+                db.all(`
+                    UPDATE guilds SET
+                    alphabet_channels = $alphabet_channels
+                    WHERE id = $guild_id
+                `, {
+                    $guild_id: msg.guild.id,
+
+                    $alphabet_channels: alphabet_channels
+                }, (err, _) => {
+                    if (err) throw err;
+                });
+            }
 
             embed = new Discord.MessageEmbed();
             embed.setColor(pastelGreen);
