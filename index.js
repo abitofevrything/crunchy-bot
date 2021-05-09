@@ -29,6 +29,26 @@ client.setProvider(
 )
 .catch(console.error);
 
+// Create DB connection
+const db = new sqlite3.Database('database.sqlite3', err => {
+    if (err) {
+        console.error(err);
+        process.exit(1);
+    }
+
+    console.log('Successfully connected to DB');
+});
+
+process.on('beforeExit', () => {
+    db.close(err => {
+        if (err) return console.error(err);
+
+        console.log('Successfully disconnected from DB');
+    });
+});
+
+module.exports.db = db;
+
 // Load commands
 client.registry.registerDefaults();
 
