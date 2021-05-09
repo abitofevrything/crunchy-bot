@@ -207,8 +207,8 @@ module.exports = class ConfigCommand extends Commando.Command {
                         } while (cn_channel_id == undefined);
                     }
                 } while ((await getSetting(msg, 'Call notifs', (cn_enabled ? 
-                    `Call notifications are enabled. They will ping ${cn_role_id == 'here' || cn_role_id == 'everyone' ? '@' + cn_role_id : '<@&' + cn_role_id + '>'} in <#${cn_channel_id}>. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section.` : 
-                    "Call notifications are disabled. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section."
+                    `Call notifications will be enabled. They will ping ${cn_role_id == 'here' || cn_role_id == 'everyone' ? '@' + cn_role_id : '<@&' + cn_role_id + '>'} in <#${cn_channel_id}>. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section.` : 
+                    "Call notifications will be disabled. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section."
                 ), pastelOrange, ['yes', 'no'])).content != 'yes');
             }
 
