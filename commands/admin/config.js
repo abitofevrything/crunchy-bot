@@ -103,6 +103,8 @@ function getChannel(msg) {
     return id;
 }
 
+let activeConfigs = [];
+
 module.exports = class ConfigCommand extends Commando.Command {
     constructor(client) {
         super(client, {
@@ -130,6 +132,21 @@ module.exports = class ConfigCommand extends Commando.Command {
 
     async run(msg, { sections }) {
         if (!(msg instanceof Discord.Message)) return;
+
+        if (activeConfigs.includes(`${msg.guild.id}-${msg.author.id}`)) {
+            let embed = new Discord.MessageEmbed();
+            embed.setColor(pastelRed);
+            embed.setTitle('Interactive config');
+            embed.setDescription("You already have a config session running. Please exit it first.");
+
+            embed.setFooter('Crunchy Bot');
+            embed.setTimestamp();
+
+            msg.embed(embed);
+            return;
+        }
+
+        activeConfigs.push(`${msg.guild.id}-${msg.author.id}`);
 
         if (sections == null) sections = [ 'all' ];
         if (sections.includes('all')) sections = allSections;
@@ -219,9 +236,13 @@ module.exports = class ConfigCommand extends Commando.Command {
             embed.setFooter('Crunchy bot');
             embed.setTimestamp();
             
-            return msg.embed(embed);
+            msg.embed(embed);
+            
+            activeConfigs = activeConfigs.filter(session => session != `${msg.guild.id}-${msg.author.id}`);
 
         } catch (e) {
+            activeConfigs = activeConfigs.filter(session => session != `${msg.guild.id}-${msg.author.id}`);
+
             if (e.toString() == 'time') {
                 embed = new Discord.MessageEmbed();
                 embed.setColor(pastelRed);
