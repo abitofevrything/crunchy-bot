@@ -46,7 +46,8 @@ function getSetting(msg, title, description, colour, options) {
 
 function getRole(msg) {
     let id;
-
+    msg.content = msg.content.trim();
+    
     if (/@everyone/.test(msg) || msg.content == 'everyone') return 'everyone';
     if (/@here/.test(msg) || msg.content == 'here') return 'here';
 
@@ -77,6 +78,7 @@ function getRole(msg) {
 
 function getChannel(msg) {
     let id;
+    msg.content = msg.content.trim();
 
     if (/(?<=<#)[0-9]{17,19}(?=>)/.test(msg.content)) {
         id = msg.guild.channels.cache.get(/(?<=<#)[0-9]{17,19}(?=>)/.exec(msg.content)[0]).id;
