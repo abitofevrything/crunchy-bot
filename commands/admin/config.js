@@ -27,7 +27,7 @@ function getSetting(msg, title, description, colour, options) {
         options = [ ...(options || []), ...exitOptions ]
 
         let collector = msg.channel.createMessageCollector(
-            m => (options.includes(m.content.toLowerCase()) || matchAll) && m.author == msg.author,
+            m => m.content && (options.includes(m.content.toLowerCase()) || matchAll) && m.author == msg.author,
             {
                 max: 1,
                 time: 600000 // Time out in 10 mins
