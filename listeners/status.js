@@ -18,11 +18,13 @@ const statuses = [
     }
 ]
 
+let index = 0;
 module.exports = {
     event: 'ready',
     callback: async () => {
         setInterval(() => {
-            client.user.setPresence(statuses[Math.floor(Math.random() * statuses.length)]);
+            client.user.setPresence(statuses[index++]);
+            index %= statuses.length;
         }, 30);
         client.user.setPresence(statuses[0]);
     }
