@@ -2,6 +2,7 @@ const Commando = require('discord.js-commando');
 const Discord = require('discord.js');
 
 const { db } = require('../../index.js');
+const Util = require('../../util.js');
 const group = require('./index.js');
 
 const pastelGreen = '#44eb52', pastelRed = '#eb4444', pastelOrange = '#f0a52e', pastelBlue = '#4795d1';
@@ -43,69 +44,6 @@ function getSetting(msg, title, description, colour, options) {
             resolve(collected.array()[0]);
         });
     });
-}
-
-function getRole(msg, search) {
-    let id;
-    if (!search) search = msg.content;
-    search = search.trim();
-
-    if (/@everyone/.test(search) || search == 'everyone') return 'everyone';
-    if (/@here/.test(search) || search == 'here') return 'here';
-
-    if (msg.mentions.roles.first()) {
-        id = msg.mentions.roles.first().id;
-    } else if (msg.guild.roles.cache.get(search)) {
-        id = msg.guild.roles.cache.get(search).id;
-    } else {
-
-        let match, ambiguous = false;
-        for (let role of msg.guild.roles.cache.array()) {
-            if (role.name == search) {
-                match = role;
-            } else if (role.name.includes(search)) {
-                ambiguous = !!match;
-                match = role;
-            }
-        }
-
-        if (match) {
-            if (ambiguous) return undefined;
-            id = match.id;
-        }
-    }
-
-    return id;
-}
-
-function getChannel(msg, search) {
-    let id;
-    if (!search) search = msg.content;
-    search = search.trim();
-
-    if (/(?<=<#)[0-9]{17,19}(?=>)/.test(search)) {
-        id = msg.guild.channels.cache.get(/(?<=<#)[0-9]{17,19}(?=>)/.exec(search)[0]).id;
-    } else if (msg.guild.channels.cache.get(search) && msg.guild.channels.cache.get(search).type == 'text') {
-        id = msg.guild.channels.cache.get(search).id;
-    } else {
-
-        let match, ambiguous = false;
-        for (let channel of msg.guild.channels.cache.array().filter(c => c.type == 'text')) {
-            if (channel.name == search) {
-                match = channel;
-            } else if (channel.name.includes(search)) {
-                ambiguous = !!match;
-                match = channel;
-            }
-        }
-
-        if (match) {
-            if (ambiguous) return undefined;
-            id = match.id;
-        }
-    }
-
-    return id;
 }
 
 let activeConfigs = [];
@@ -169,7 +107,7 @@ module.exports = class ConfigCommand extends Commando.Command {
         try {
 
             // Section 1: call_notifs
-            let cn_enabled, cn_role_id, cn_channel_id;
+            let cn_enabled, cn_role, cn_channel;
             if (sections.includes('call_notifs')) {
                 do {
                     let cn_enabled_message = await getSetting(msg, 'Call notifs', "Reply with 'yes' to enable call notifs or with 'no' to disable them.", pastelBlue, ['yes', 'no']);
@@ -178,9 +116,9 @@ module.exports = class ConfigCommand extends Commando.Command {
                     if (cn_enabled) {
                         do {
                             let cn_role_message = await getSetting(msg, 'Call notifs', "Reply with the role to ping when a user joins a vc. You can ping the role, enter the id or enter the role name.", pastelBlue);
-                            cn_role_id = getRole(cn_role_message);
+                            cn_role = Util.getRole(msg.guild, cn_role_message.content);
 
-                            if (cn_role_id == undefined) {
+                            if (cn_role == undefined) {
                                 embed = new Discord.MessageEmbed();
                                 embed.setTitle('Role not found');
                                 embed.setColor(pastelRed);
@@ -192,13 +130,13 @@ module.exports = class ConfigCommand extends Commando.Command {
                                 msg.embed(embed);
                             }
 
-                        } while (cn_role_id == undefined);
+                        } while (cn_role == undefined);
 
                         do {
                             let cn_channel_message = await getSetting(msg, 'Call notifs', "Reply with the channel to ping in when a user joins a vc. You can link the channel, enter the id or enter the channel name.", pastelBlue);
-                            cn_channel_id = getChannel(cn_channel_message);
+                            cn_channel = Util.getChannel(msg.guild, cn_channel_message.content);
 
-                            if (cn_channel_id == undefined) {
+                            if (cn_channel == undefined) {
                                 embed = new Discord.MessageEmbed();
                                 embed.setTitle('Channel not found');
                                 embed.setColor(pastelRed);
@@ -209,10 +147,10 @@ module.exports = class ConfigCommand extends Commando.Command {
 
                                 msg.embed(embed);
                             }
-                        } while (cn_channel_id == undefined);
+                        } while (cn_channel == undefined);
                     }
                 } while ((await getSetting(msg, 'Call notifs', (cn_enabled ? 
-                    `Call notifications will be enabled. They will ping ${cn_role_id == 'here' || cn_role_id == 'everyone' ? '@' + cn_role_id : '<@&' + cn_role_id + '>'} in <#${cn_channel_id}>. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section.` : 
+                    `Call notifications will be enabled. They will ping ${cn_role} in ${cn_channel}. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section.` : 
                     "Call notifications will be disabled. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section."
                 ), pastelOrange, ['yes', 'no'])).content != 'yes');
             }
@@ -231,8 +169,8 @@ module.exports = class ConfigCommand extends Commando.Command {
                         if (content.trim() == 'all' || content.trim() == '*') {
                             alphabet_channels = '*';
                         } else {
-                            split_channels = content.split(',').map(c => getChannel(msg, c)).filter(Boolean);
-                            alphabet_channels = split_channels.join(',');
+                            split_channels = content.split(',').map(c => Util.getChannel(msg.guild, c)).filter(Boolean);
+                            alphabet_channels = split_channels.map(c => c.id).join(',');
                         }
                     }
 
@@ -241,8 +179,8 @@ module.exports = class ConfigCommand extends Commando.Command {
                     (alphabet_channels == '*' ?
                         "Alphabet will be enabled in all channels. Is this correct? Replay with 'yes' to continue or with 'no' to redo this section." :
                         `Alphabet will be enabled in the following channel${(split_channels.length == 1 ?
-                            ': <#' + split_channels[0] + '>' :
-                            's: <#' + split_channels.slice(0, split_channels.length - 1).join('>, <#') + '> and <#' + split_channels[split_channels.length - 1] + '>'
+                            ': ' + split_channels[0].toString() :
+                            's: ' + split_channels.slice(0, split_channels.length - 1).map(c => c.toString()).join() + ' and ' + split_channels[split_channels.length - 1].toString()
                         )}. Is this correct? Replay with 'yes' to continue or with 'no' to redo this section.`
                     )
                 ), pastelOrange, ['yes', 'no'])).content != 'yes');
@@ -259,8 +197,8 @@ module.exports = class ConfigCommand extends Commando.Command {
                     $guild_id: msg.guild.id,
 
                     $cn_enabled: cn_enabled ? 1 : 0,
-                    $cn_role_id: cn_role_id,
-                    $cn_channel_id: cn_channel_id
+                    $cn_role_id: (cn_role == '@everyone' || cn_role == '@here' ? cn_role.substring(1) : cn_role?.id),
+                    $cn_channel_id: cn_channel?.id
                 }, (err, _) => {
                     if (err) throw err;
                 });
