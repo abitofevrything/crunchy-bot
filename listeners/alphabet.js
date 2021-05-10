@@ -31,42 +31,23 @@ module.exports = {
 
                 if (enabled) {
                     let content = message.content.toLowerCase().trim();
+                    let expected = alphabetData[`${message.guild.id}-${message.channel.id}-${message.author.id}`] || 'a'.charCodeAt(0);
+                
+                    let isOneRepeatedCharacter = /^(.)\1*$/g.test(content);
 
-                    if (/([a-z])\1*/.exec(content) && /([a-z])\1*/.exec(content)[0] == content) {
-                        let sent = content.charCodeAt(0);
-                        let expected = alphabetData[`${message.guild.id}-${message.channel.id}-${message.author.id}`] || 'a'.charCodeAt(0);
-
-                        if (sent == expected) {
-                            if (expected > 'z'.charCodeAt(0)) {
-                                message.channel.send(generateError());
-                            } else {
-                                message.channel.send(String.fromCharCode(expected + 1).repeat(message.content.length));
-                            }
-
+                    if (!isOneRepeatedCharacter && expected != 'a'.charCodeAt(0)) {
+                        if (content.length <= 3) message.channel.send("**Your streak was broken**\n*You stoopid*");
+                        alphabetData[`${message.guild.id}-${message.channel.id}-${message.author.id}`] = 'a'.charCodeAt(0);
+                    } else if (isOneRepeatedCharacter) {
+                        if (content.charCodeAt(0) == expected) {
+                            if (expected > 'z'.charCodeAt(0)) message.channel.send(generateError());
+                            message.channel.send(String.fromCharCode(expected + 1).repeat(content.length));
                             alphabetData[`${message.guild.id}-${message.channel.id}-${message.author.id}`] = expected + 2;
                         } else {
-                            if (
-                                (alphabetData[`${message.guild.id}-${message.channel.id}-${message.author.id}`] == undefined) ||
-                                (alphabetData[`${message.guild.id}-${message.channel.id}-${message.author.id}`] == 'a'.charCodeAt(0)) ||
-                                (alphabetData[`${message.guild.id}-${message.channel.id}-${message.author.id}`] > 'z'.charCodeAt(0))
-                            ) {
-                                alphabetData[`${message.guild.id}-${message.channel.id}-${message.author.id}`] = 'a'.charCodeAt(0);
-                                return;
+                            if (expected != 'a'.charCodeAt(0) &&!(expected > 'z'.charCodeAt(0))) {
+                                message.channel.send("**Your streak was broken**\n*You stoopid*");
                             }
-
-                            message.channel.send('**Your streak was broken**\n*You stoopid*');
                             alphabetData[`${message.guild.id}-${message.channel.id}-${message.author.id}`] = 'a'.charCodeAt(0);
-                        }
-                    } else {
-                        alphabetData[`${message.guild.id}-${message.channel.id}-${message.author.id}`] = 'a'.charCodeAt(0);
-
-                        if (content.length > 3) return;
-            
-                        if (
-                            (alphabetData[`${message.guild.id}-${message.channel.id}-${message.author.id}`] != undefined) &&
-                            (alphabetData[`${message.guild.id}-${message.channel.id}-${message.author.id}`] != 'a'.charCodeAt(0))
-                        ) {
-                            message.channel.send('**Your streak was broken**\n*You stoopid*');
                         }
                     }
                 }
