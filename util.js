@@ -92,4 +92,16 @@ module.exports = class Util extends Discord.Util {
         }
     }
 
+    static makeUserPing(id) {
+        return '<@!' + id + '>';
+    }
+
+    static makeRolePing(id) {
+        return '<@&' + id + '>';
+    }
+
+    static makeChannelLink(id) {
+        return '<#' + id + '>';
+    }
+
 }
