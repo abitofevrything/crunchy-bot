@@ -5,8 +5,6 @@ const { db } = require('../../index.js');
 const Util = require('../../util.js');
 const group = require('./index.js');
 
-const pastelGreen = '#44eb52', pastelRed = '#eb4444', pastelOrange = '#f0a52e', pastelBlue = '#4795d1';
-
 const allSections = [
     'call_notifs',
     'alphabet'
@@ -78,7 +76,7 @@ module.exports = class ConfigCommand extends Commando.Command {
 
         if (activeConfigs.includes(`${msg.guild.id}-${msg.author.id}`)) {
             let embed = new Discord.MessageEmbed();
-            embed.setColor(pastelRed);
+            embed.setColor(Util.pastelRed);
             embed.setTitle('Interactive config');
             embed.setDescription("You already have a config session running. Please exit it first.");
 
@@ -95,7 +93,7 @@ module.exports = class ConfigCommand extends Commando.Command {
         if (sections.includes('all')) sections = allSections;
 
         let embed = new Discord.MessageEmbed();
-        embed.setColor(pastelGreen);
+        embed.setColor(Util.pastelGreen);
         embed.setTitle('Interactive config');
         embed.setDescription("Welcome to the interactive config! Reply with 'quit' at any time to exit the config.\nThe changes you have made will not be saved if you exit.");
 
@@ -110,18 +108,18 @@ module.exports = class ConfigCommand extends Commando.Command {
             let cn_enabled, cn_role, cn_channel;
             if (sections.includes('call_notifs')) {
                 do {
-                    let cn_enabled_message = await getSetting(msg, 'Call notifs', "Reply with 'yes' to enable call notifs or with 'no' to disable them.", pastelBlue, ['yes', 'no']);
+                    let cn_enabled_message = await getSetting(msg, 'Call notifs', "Reply with 'yes' to enable call notifs or with 'no' to disable them.", Util.pastelBlue, ['yes', 'no']);
                     cn_enabled = cn_enabled_message.content == 'yes';
 
                     if (cn_enabled) {
                         do {
-                            let cn_role_message = await getSetting(msg, 'Call notifs', "Reply with the role to ping when a user joins a vc. You can ping the role, enter the id or enter the role name.", pastelBlue);
+                            let cn_role_message = await getSetting(msg, 'Call notifs', "Reply with the role to ping when a user joins a vc. You can ping the role, enter the id or enter the role name.", Util.pastelBlue);
                             cn_role = Util.getRole(msg.guild, cn_role_message.content);
 
                             if (cn_role == undefined) {
                                 embed = new Discord.MessageEmbed();
                                 embed.setTitle('Role not found');
-                                embed.setColor(pastelRed);
+                                embed.setColor(Util.pastelRed);
                                 embed.setDescription("Role not found. Please try again.");
 
                                 embed.setFooter('Crunchy Bot');
@@ -133,13 +131,13 @@ module.exports = class ConfigCommand extends Commando.Command {
                         } while (cn_role == undefined);
 
                         do {
-                            let cn_channel_message = await getSetting(msg, 'Call notifs', "Reply with the channel to ping in when a user joins a vc. You can link the channel, enter the id or enter the channel name.", pastelBlue);
+                            let cn_channel_message = await getSetting(msg, 'Call notifs', "Reply with the channel to ping in when a user joins a vc. You can link the channel, enter the id or enter the channel name.", Util.pastelBlue);
                             cn_channel = Util.getChannel(msg.guild, cn_channel_message.content);
 
                             if (cn_channel == undefined) {
                                 embed = new Discord.MessageEmbed();
                                 embed.setTitle('Channel not found');
-                                embed.setColor(pastelRed);
+                                embed.setColor(Util.pastelRed);
                                 embed.setDescription("Channel not found. Please try again.");
 
                                 embed.setFooter('Crunchy Bot');
@@ -152,18 +150,18 @@ module.exports = class ConfigCommand extends Commando.Command {
                 } while ((await getSetting(msg, 'Call notifs', (cn_enabled ? 
                     `Call notifications will be enabled. They will ping ${cn_role} in ${cn_channel}. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section.` : 
                     "Call notifications will be disabled. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section."
-                ), pastelOrange, ['yes', 'no'])).content != 'yes');
+                ), Util.pastelOrange, ['yes', 'no'])).content != 'yes');
             }
 
             // Section 2: alphabet
             let alphabet_channels, split_channels;
             if (sections.includes('alphabet')) {
                 do {
-                    let alphabet_enabled_message = await getSetting(msg, 'Alphabet', "Reply with 'yes' to enable alphabet or with 'no' to disable it.\nIf you select yes, you will be able to configure which channels it is enabled in.", pastelBlue, ['yes', 'no']);
+                    let alphabet_enabled_message = await getSetting(msg, 'Alphabet', "Reply with 'yes' to enable alphabet or with 'no' to disable it.\nIf you select yes, you will be able to configure which channels it is enabled in.", Util.pastelBlue, ['yes', 'no']);
                     if (alphabet_enabled_message.content == 'no') alphabet_channels = '-';
 
                     if (alphabet_channels != '-') {
-                        let alphabet_channels_message = await getSetting(msg, 'Alphabet', "Reply with a comma-separated list of channel links, names or ids to enable alphabet in. If you want alphabet to be enabled globally, reply with 'all' or '*'.", pastelBlue);
+                        let alphabet_channels_message = await getSetting(msg, 'Alphabet', "Reply with a comma-separated list of channel links, names or ids to enable alphabet in. If you want alphabet to be enabled globally, reply with 'all' or '*'.", Util.pastelBlue);
                         let content = alphabet_channels_message.content.trim();
 
                         if (content.trim() == 'all' || content.trim() == '*') {
@@ -183,7 +181,7 @@ module.exports = class ConfigCommand extends Commando.Command {
                             's: ' + split_channels.slice(0, split_channels.length - 1).map(c => c.toString()).join() + ' and ' + split_channels[split_channels.length - 1].toString()
                         )}. Is this correct? Replay with 'yes' to continue or with 'no' to redo this section.`
                     )
-                ), pastelOrange, ['yes', 'no'])).content != 'yes');
+                ), Util.pastelOrange, ['yes', 'no'])).content != 'yes');
             }
 
             if (cn_enabled !== undefined) {
@@ -219,7 +217,7 @@ module.exports = class ConfigCommand extends Commando.Command {
             }
 
             embed = new Discord.MessageEmbed();
-            embed.setColor(pastelGreen);
+            embed.setColor(Util.pastelGreen);
             embed.setTitle('Interactive config');
             embed.setDescription("Config saved.");
 
@@ -235,7 +233,7 @@ module.exports = class ConfigCommand extends Commando.Command {
 
             if (e.toString() == 'time') {
                 embed = new Discord.MessageEmbed();
-                embed.setColor(pastelRed);
+                embed.setColor(Util.pastelRed);
                 embed.setTitle('Config timed out');
                 embed.setDescription("You took too long to reply and the config has timed out. Any changes have been discarded.");
 
@@ -245,7 +243,7 @@ module.exports = class ConfigCommand extends Commando.Command {
                 return msg.embed(embed);
             } else if (e.toString() == 'aborted') {
                 embed = new Discord.MessageEmbed();
-                embed.setColor(pastelRed);
+                embed.setColor(Util.pastelRed);
                 embed.setTitle('Config aborted');
                 embed.setDescription("Exited config and discarded changes.");
 

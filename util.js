@@ -2,6 +2,11 @@ const Discord = require('discord.js');
 
 module.exports = class Util extends Discord.Util {
 
+    static pastelGreen = '#44eb52';
+    static pastelRed = '#eb4444';
+    static pastelOrange = '#f0a52e';
+    static pastelBlue = '#4795d1';
+
     static getChannel(guild, str) {
         str = str.trim();
         if (str.startsWith('#')) str = str.substring(1);
