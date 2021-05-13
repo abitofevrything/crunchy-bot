@@ -74,7 +74,13 @@ for (let dir of fs.readdirSync(path.join(__dirname, 'commands'))) {
 for (let file of fs.readdirSync(path.join(__dirname, 'listeners'))) {
     let listener = require(path.join(__dirname, 'listeners', file));
 
-    client.on(listener.event, listener.callback);
+    client.on(listener.event, (...args) => {
+        try {
+            listener.callback(...args);
+        } catch (e) {
+            console.error(e);
+        }
+    });
 
     console.log(`Loaded listener '${listener.event}' (${file})`);
 }
