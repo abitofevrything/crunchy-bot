@@ -10,36 +10,27 @@ const allSections = [
     'alphabet'
 ];
 
-function getSetting(msg, title, description, colour, options) {
+function getSetting(msg, sectionTitle, query, matcher = /.*/i, colour = Util.pastelBlue) {
     return new Promise((resolve, reject) => {
-        if (!(msg instanceof Discord.Message)) return;
+        if (!(matcher instanceof RegExp)) matcher = new RegExp('^' + matcher + '$', 'i');
+        if (!matcher.flags.includes('i')) matcher = new RegExp(matcher.source, matcher.flags + 'i');
+        if (!matcher.source.startsWith('^')) matcher = new RegExp('^' + matcher.source, matcher.flags);
+        if (!matcher.source.endsWith('$')) matcher = new RegExp(matcher.source + '$', matcher.flags);
 
-        let embed = new Discord.MessageEmbed();
-        embed.setTitle(title);
-        embed.setDescription(description);
-        embed.setColor(colour);
+        if (!(msg instanceof Commando.CommandoMessage)) return;
 
-        msg.channel.send(embed);
+        msg.embed(Util.createEmbed(sectionTitle, query, colour));
 
-        let matchAll = options == undefined;
-
-        const exitOptions = ['exit', 'quit'];
-        options = [ ...(options || []), ...exitOptions ]
-
-        let collector = msg.channel.createMessageCollector(
-            m => m.content && (options.includes(m.content.toLowerCase()) || matchAll) && m.author == msg.author,
-            {
-                max: 1,
-                time: 600000 // Time out in 10 mins
-            }
-        );
+        let collector = msg.channel.createMessageCollector(m => m.content && (matcher.test(m.content.trim()) || /^(abort|exit|quit)$/i.test(m.content.trim())), {
+            max: 1,
+            time: 600_000
+        });
 
         collector.on('end', (collected, reason) => {
             if (reason == 'time') return reject('time');
+            if (/^(abort|exit|quit)$/i.test(collected.array()[0].content.trim())) return reject('aborted');
 
-            if (exitOptions.includes(collected.array()[0].content)) return reject('aborted');
-
-            resolve(collected.array()[0]);
+            resolve(collected.array()[0].content.trim().toLowerCase());
         });
     });
 }
@@ -75,16 +66,7 @@ module.exports = class ConfigCommand extends Commando.Command {
         if (!(msg instanceof Discord.Message)) return;
 
         if (activeConfigs.includes(`${msg.guild.id}-${msg.author.id}`)) {
-            let embed = new Discord.MessageEmbed();
-            embed.setColor(Util.pastelRed);
-            embed.setTitle('Interactive config');
-            embed.setDescription("You already have a config session running. Please exit it first.");
-
-            embed.setFooter('Crunchy Bot');
-            embed.setTimestamp();
-
-            msg.embed(embed);
-            return;
+            return msg.embed(Util.createEmbed('Interactive config', "You already have a config session running. Please exit it first.", Util.pastelRed));
         }
 
         activeConfigs.push(`${msg.guild.id}-${msg.author.id}`);
@@ -92,96 +74,53 @@ module.exports = class ConfigCommand extends Commando.Command {
         if (sections == null) sections = [ 'all' ];
         if (sections.includes('all')) sections = allSections;
 
-        let embed = new Discord.MessageEmbed();
-        embed.setColor(Util.pastelGreen);
-        embed.setTitle('Interactive config');
-        embed.setDescription("Welcome to the interactive config! Reply with 'quit' at any time to exit the config.\nThe changes you have made will not be saved if you exit.");
-
-        embed.setFooter('Crunchy Bot');
-        embed.setTimestamp();
-
-        msg.embed(embed);
+        msg.embed(Util.createEmbed('Interactive config', "Welcome to the interactive config! Reply with 'quit' at any time to exit the config.\nThe changes you have made will not be saved if you exit.", Util.pastelGreen));
 
         try {
-
             // Section 1: call_notifs
             let cn_enabled, cn_role, cn_channel;
             if (sections.includes('call_notifs')) {
                 do {
-                    let cn_enabled_message = await getSetting(msg, 'Call notifs', "Reply with 'yes' to enable call notifs or with 'no' to disable them.", Util.pastelBlue, ['yes', 'no']);
-                    cn_enabled = cn_enabled_message.content == 'yes';
+                    cn_enabled = (await getSetting(msg, 'Call notifs', "Do you want to enable call notifications? Reply with 'yes' to enable them or with 'no' to disable them.", /^(yes|no)$/i)) == 'yes';
 
                     if (cn_enabled) {
                         do {
-                            let cn_role_message = await getSetting(msg, 'Call notifs', "Reply with the role to ping when a user joins a vc. You can ping the role, enter the id or enter the role name.", Util.pastelBlue);
-                            cn_role = Util.getRole(msg.guild, cn_role_message.content);
+                            cn_role = Util.getRole(msg.guild, await getSetting(msg, 'Call notifs', "Reply with the role to ping when a user joins a vc. You can ping the role, enter the id or enter the role name."));
 
-                            if (cn_role == undefined) {
-                                embed = new Discord.MessageEmbed();
-                                embed.setTitle('Role not found');
-                                embed.setColor(Util.pastelRed);
-                                embed.setDescription("Role not found. Please try again.");
-
-                                embed.setFooter('Crunchy Bot');
-                                embed.setTimestamp();
-
-                                msg.embed(embed);
+                            if (cn_role == undefined){
+                                msg.embed(Util.createEmbed('Role not found.', "Role not found. Please try again.", Util.pastelRed));
                             }
 
                         } while (cn_role == undefined);
 
                         do {
-                            let cn_channel_message = await getSetting(msg, 'Call notifs', "Reply with the channel to ping in when a user joins a vc. You can link the channel, enter the id or enter the channel name.", Util.pastelBlue);
-                            cn_channel = Util.getChannel(msg.guild, cn_channel_message.content);
+                            cn_channel = Util.getChannel(msg.guild, await getSetting(msg, 'Call notifs', "Reply with the channel to ping in when a user joins a vc. You can link the channel, enter the id or enter the channel name."));
 
                             if (cn_channel == undefined) {
-                                embed = new Discord.MessageEmbed();
-                                embed.setTitle('Channel not found');
-                                embed.setColor(Util.pastelRed);
-                                embed.setDescription("Channel not found. Please try again.");
-
-                                embed.setFooter('Crunchy Bot');
-                                embed.setTimestamp();
-
-                                msg.embed(embed);
+                                msg.embed(Util.createEmbed('Channel not found.', "Channel not found. Please try again."));
                             }
+
                         } while (cn_channel == undefined);
                     }
-                } while ((await getSetting(msg, 'Call notifs', (cn_enabled ? 
-                    `Call notifications will be enabled. They will ping ${cn_role} in ${cn_channel}. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section.` : 
-                    "Call notifications will be disabled. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section."
-                ), Util.pastelOrange, ['yes', 'no'])).content != 'yes');
+                } while ((await getSetting(msg, 'Call notifs', `Call notifications ${cn_enabled ? "will be enabled. They will ping " + Util.makeRolePing(cn_role.id) + " in " + Util.makeChannelLink(cn_channel.id) : "will be disabled"}. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section.`, /^(yes|no)$/i, Util.pastelOrange)) != 'yes');
             }
 
             // Section 2: alphabet
-            let alphabet_channels, split_channels;
+            let alphabet_channels;
             if (sections.includes('alphabet')) {
                 do {
-                    let alphabet_enabled_message = await getSetting(msg, 'Alphabet', "Reply with 'yes' to enable alphabet or with 'no' to disable it.\nIf you select yes, you will be able to configure which channels it is enabled in.", Util.pastelBlue, ['yes', 'no']);
-                    if (alphabet_enabled_message.content == 'no') alphabet_channels = '-';
+                    alphabet_channels = (await getSetting(msg, 'Alphabet', "Reply with 'yes' to enable alphabet or with 'no' to disable it.", /^(yes|no)$/i)) == 'no' ? '-' : '*';
 
                     if (alphabet_channels != '-') {
-                        let alphabet_channels_message = await getSetting(msg, 'Alphabet', "Reply with a comma-separated list of channel links, names or ids to enable alphabet in. If you want alphabet to be enabled globally, reply with 'all' or '*'.", Util.pastelBlue);
-                        let content = alphabet_channels_message.content.trim();
-
-                        if (content.trim() == 'all' || content.trim() == '*') {
+                        let channel_str = await getSetting(msg, 'Alphabet', "Reply with a comma-seperated list of channels to enable alphabet in. To enable it in ll channels, reply with '*' or 'all'.")
+                    
+                        if (channel_str == 'all' || channel_str == '*') {
                             alphabet_channels = '*';
                         } else {
-                            split_channels = content.split(',').map(c => Util.getChannel(msg.guild, c)).filter(Boolean);
-                            alphabet_channels = split_channels.map(c => c.id).join(',');
+                            alphabet_channels = channel_str.split(',').map(c => Util.getChannel(msg.guild, c)).filter(Boolean).map(c => c.id).join(',');
                         }
                     }
-
-                } while ((await getSetting(msg, 'Alphabet', (alphabet_channels == '-' ?
-                    "Alphabet will be disabled. Is this correct? Replay with 'yes' to continue or with 'no' to redo this section." :
-                    (alphabet_channels == '*' ?
-                        "Alphabet will be enabled in all channels. Is this correct? Replay with 'yes' to continue or with 'no' to redo this section." :
-                        `Alphabet will be enabled in the following channel${(split_channels.length == 1 ?
-                            ': ' + split_channels[0].toString() :
-                            's: ' + split_channels.slice(0, split_channels.length - 1).map(c => c.toString()).join() + ' and ' + split_channels[split_channels.length - 1].toString()
-                        )}. Is this correct? Replay with 'yes' to continue or with 'no' to redo this section.`
-                    )
-                ), Util.pastelOrange, ['yes', 'no'])).content != 'yes');
+                } while ((await getSetting(msg, 'Alphabet', `Alphabet will be ${alphabet_channels == '-' ? 'disabled' : 'enabled in ' + (alphabet_channels == '*' ? 'all channels' : 'the following channels : <#' + alphabet_channels.split(',').join('>, <#') + '>')}. Is this correct? Reply with 'yes' to continue or with 'no' to redo this section.`, /^(yes|no)$/i, Util.pastelOrange)) != 'yes');
             }
 
             if (cn_enabled !== undefined) {
@@ -205,7 +144,7 @@ module.exports = class ConfigCommand extends Commando.Command {
             if (alphabet_channels !== undefined) {
                 db.all(`
                     UPDATE guilds SET
-                    alphabet_channels = $alphabet_channels
+                        alphabet_channels = $alphabet_channels
                     WHERE id = $guild_id
                 `, {
                     $guild_id: msg.guild.id,
@@ -215,16 +154,8 @@ module.exports = class ConfigCommand extends Commando.Command {
                     if (err) throw err;
                 });
             }
-
-            embed = new Discord.MessageEmbed();
-            embed.setColor(Util.pastelGreen);
-            embed.setTitle('Interactive config');
-            embed.setDescription("Config saved.");
-
-            embed.setFooter('Crunchy bot');
-            embed.setTimestamp();
             
-            msg.embed(embed);
+            msg.embed(Util.embed('Interactive config', "Config saved", Util.pastelGreen));
             
             activeConfigs = activeConfigs.filter(session => session != `${msg.guild.id}-${msg.author.id}`);
 
@@ -232,25 +163,9 @@ module.exports = class ConfigCommand extends Commando.Command {
             activeConfigs = activeConfigs.filter(session => session != `${msg.guild.id}-${msg.author.id}`);
 
             if (e.toString() == 'time') {
-                embed = new Discord.MessageEmbed();
-                embed.setColor(Util.pastelRed);
-                embed.setTitle('Config timed out');
-                embed.setDescription("You took too long to reply and the config has timed out. Any changes have been discarded.");
-
-                embed.setFooter('Crunchy Bot');
-                embed.setTimestamp();
-
-                return msg.embed(embed);
+                return msg.embed(Util.createEmbed('Config timed out', "You took too long to reply and the config has timed out. Any changes have been discarded.", Util.pastelRed));
             } else if (e.toString() == 'aborted') {
-                embed = new Discord.MessageEmbed();
-                embed.setColor(Util.pastelRed);
-                embed.setTitle('Config aborted');
-                embed.setDescription("Exited config and discarded changes.");
-
-                embed.setFooter('Crunchy Bot');
-                embed.setTimestamp();
-
-                return msg.embed(embed);
+                return msg.embed(Util.createEmbed('Config aborted', "Exited config and discarded changes.", Util.pastelRed));
             } else {
                 return super.onError(e, msg);
             }
