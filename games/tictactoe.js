@@ -22,14 +22,7 @@ module.exports = class TicTacToe {
         let turn = Math.round(Math.random());
 
         do {
-            let embed = new Discord.MessageEmbed();
-            embed.setTitle('Tic-tac-toe');
-            embed.setColor(Util.pastelBlue);
-            embed.setDescription(this.createBoardString());
-            embed.setFooter('Crunchy bot');
-            embed.setTimestamp();
-
-            await this.channel.send(embed);
+            await this.channel.send(Util.createEmbed('Tic-Tac-Toe', this.createBoardString()));
             await this.channel.send(`${this.players[turn]}, it's your turn! Reply with a number 1-9 to choose where to play!`);
 
             let move;

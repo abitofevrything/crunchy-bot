@@ -109,4 +109,14 @@ module.exports = class Util extends Discord.Util {
         return '<#' + id + '>';
     }
 
+    static createEmbed(title, description, colour = this.pastelBlue) {
+        let embed = new Discord.MessageEmbed();
+        embed.setTitle(title);
+        embed.setDescription(description);
+        embed.setColor(colour);
+        embed.setFooter('Crunchy Bot');
+        embed.setTimestamp();
+        return embed;
+    }
+
 }

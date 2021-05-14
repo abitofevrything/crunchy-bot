@@ -60,39 +60,12 @@ module.exports = class TicTacToeCommand extends Commando.Command {
             await game.start();
 
             if (game.timedOut) {
-                let embed = new Discord.MessageEmbed();
-                embed.setTitle('Tic-Tac-Toe');
-                embed.setColor(Util.pastelRed);
-
-                embed.setDescription('Game timed out.');
-
-                embed.setFooter('Crunchy Bot');
-                embed.setTimestamp();
-
-                msg.embed(embed);
+                msg.embed(Util.createEmbed('Tic-Tac-Toe', "Game timed out.", Util.pastelRed));
             } else {
                 if (!game.winner) {
-                    let embed = new Discord.MessageEmbed();
-                    embed.setTitle('Tic-Tac-Toe');
-                    embed.setColor(Util.pastelGreen);
-
-                    embed.setDescription(`The game ended in a draw!`);
-
-                    embed.setFooter('Crunchy Bot');
-                    embed.setTimestamp();
-
-                    msg.embed(embed);
+                    msg.embed(Util.createEmbed('Tic-Tac-Toe', "The game ended in a draw!", Util.pastelGreen));
                 } else {
-                    let embed = new Discord.MessageEmbed();
-                    embed.setTitle('Tic-Tac-Toe');
-                    embed.setColor(Util.pastelGreen);
-
-                    embed.setDescription(`${game.winner} wins!`);
-
-                    embed.setFooter('Crunchy Bot');
-                    embed.setTimestamp();
-
-                    msg.embed(embed);
+                    msg.embed(Util.createEmbed('Tic-tac-Toe', `${game.winner} wins!`, Util.pastelGreen));
                 }
             }
 
