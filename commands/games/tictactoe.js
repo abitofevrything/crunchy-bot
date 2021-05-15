@@ -69,8 +69,8 @@ module.exports = class TicTacToeCommand extends Commando.Command {
                 }
             }
 
-            games = games.splice(games.indexOf(userKey));
-            games = games.splice(games.indexOf(opponentKey));
+            games.splice(games.indexOf(userKey));
+            games.splice(games.indexOf(opponentKey));
         } else {
             let clearRequestTimeout = setTimeout(() => {
                 delete requests[userKey];
