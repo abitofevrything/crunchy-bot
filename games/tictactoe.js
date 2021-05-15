@@ -16,6 +16,7 @@ module.exports = class TicTacToe {
         this.winner = null;
 
         this.timedOut = false;
+        this.cancelled = false;
     }
 
     async start() {
@@ -27,13 +28,26 @@ module.exports = class TicTacToe {
 
             let move;
             do {
-                move = await this.channel.awaitMessages(m => /^[1-9]$/g.test(m.content) && m.member == this.players[turn], {
-                    max: 1,
-                    time: 600_000,
-                    errors: ['time']
-                }).catch(e => {this.timedOut = true});
+                move = await new Promise((resolve, reject) => {
+                    this.runningCollector = this.channel.createMessageCollector(m => /^[1-9]$|^cancel$/i.test(m.content) && m.member == this.players[turn], {
+                        max: 1,
+                        time: 600_000
+                    });
+
+                    this.runningCollector.on('end', (collected, reason) => {
+                        if (reason == 'time') return reject('time');
+                        if (/^cancel$/i.test(collected.array()[0].content)) return reject('cancelled');
+                        resolve(collected.array()[0].content);
+                    });
+                }).catch(err => {
+                    if (err == 'time') this.timedOut = true;
+                    if (err == 'cancelled') this.cancelled = true;
+
+                    move = undefined;
+                });
+
             } while (move != undefined && this.board[parseInt(move.array()[0].content) - 1] != null);
-            if (move == undefined) return; //Timed out
+            if (move == undefined) return; //Timed out or cancelled
 
             this.board[parseInt(move.array()[0].content) - 1] = this.players[turn];
 

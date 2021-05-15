@@ -61,6 +61,8 @@ module.exports = class TicTacToeCommand extends Commando.Command {
 
             if (game.timedOut) {
                 msg.embed(Util.createEmbed('Tic-Tac-Toe', "Game timed out.", Util.pastelRed));
+            } else if (game.cancelled) {
+                msg.embed(Util.createEmbed('Tic-Tac-Toe', "Game cancelled.", Util.pastelRed));
             } else {
                 if (!game.winner) {
                     msg.embed(Util.createEmbed('Tic-Tac-Toe', "The game ended in a draw!", Util.pastelGreen));
