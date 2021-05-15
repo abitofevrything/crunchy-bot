@@ -1,7 +1,7 @@
 const Commando = require('discord.js-commando');
 const Discord = require('discord.js');
 
-const TacTacToe = require('../../games/tictactoe.js');
+const TicTacToe = require('../../games/tictactoe.js');
 const Util = require('../../util.js');
 
 const group = require('./index.js');
@@ -55,7 +55,7 @@ module.exports = class TicTacToeCommand extends Commando.Command {
             games.push(userKey);
             games.push(opponentKey);
 
-            let game = new TacTacToe(msg.member, opponent, msg.channel);
+            let game = new TicTacToe(msg.member, opponent, msg.channel);
 
             await game.start();
 
