@@ -46,10 +46,10 @@ module.exports = class TicTacToe {
                     move = undefined;
                 });
 
-            } while (move != undefined && this.board[parseInt(move.array()[0].content) - 1] != null);
+            } while (move != undefined && this.board[parseInt(move) - 1] != null);
             if (move == undefined) return; //Timed out or cancelled
 
-            this.board[parseInt(move.array()[0].content) - 1] = this.players[turn];
+            this.board[parseInt(move) - 1] = this.players[turn];
 
             turn = (turn + 1) % 2;
         } while (!this.hasEnded());
