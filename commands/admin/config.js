@@ -155,7 +155,7 @@ module.exports = class ConfigCommand extends Commando.Command {
                 });
             }
             
-            msg.embed(Util.embed('Interactive config', "Config saved", Util.pastelGreen));
+            msg.embed(Util.createEmbed('Interactive config', "Config saved", Util.pastelGreen));
             
             activeConfigs = activeConfigs.filter(session => session != `${msg.guild.id}-${msg.author.id}`);
 
