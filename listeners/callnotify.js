@@ -28,7 +28,7 @@ module.exports = {
                 let channel = guild.channels.cache.get(row["callnotify_channel"]);
 
                 if (role && channel && channel.send) {
-                   await channel.send(`Hey ${role.toString()}, ${newState.member.toString()} just joined a VC! Join ${newState.channel.name} to chat with them!`);
+                   await channel.send(`Hey ${role.toString()}, ${newState.member.toString()} just joined a VC! Join <#${newState.channel.id}> to chat with them!`);
                 }
             }
         });
