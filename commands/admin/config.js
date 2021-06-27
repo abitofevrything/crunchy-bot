@@ -21,7 +21,7 @@ function getSetting(msg, sectionTitle, query, matcher = /.*/i, colour = Util.pas
 
         msg.embed(Util.createEmbed(sectionTitle, query, colour));
 
-        let collector = msg.channel.createMessageCollector(m => m.content && (matcher.test(m.content.trim()) || /^(abort|exit|quit)$/i.test(m.content.trim())), {
+        let collector = msg.channel.createMessageCollector(m => m.author.id == msg.author.id && m.content && (matcher.test(m.content.trim()) || /^(abort|exit|quit)$/i.test(m.content.trim())), {
             max: 1,
             time: 600_000
         });
