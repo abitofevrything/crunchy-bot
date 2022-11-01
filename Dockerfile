@@ -8,7 +8,7 @@ COPY package.json package-lock.json* .
 RUN set -ex; \
         apt-get update; \
         apt-get install -y --no-install-recommends \
-                python-is-python3
+                python-is-python3 \
         ; \
         rm -rf /var/lib/apt/lists/*
 
