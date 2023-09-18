@@ -1,0 +1,14 @@
+name: crunchy_bot
+description: The Discord bot for my friends' server.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  nyxx: ^6.0.0-dev.3
+  nyxx_commands: ^6.0.0-dev.1  
+  
+dev_dependencies:
+  lints: ^2.0.0
