@@ -1,19 +1,17 @@
-FROM node:latest
-ENV NODE_ENV=production
+FROM dart:stable
 
-WORKDIR /app
+WORKDIR /bot
 
-COPY package.json package-lock.json* .
+# Install dependencies
+COPY pubspec.* /bot/
+RUN dart pub get
 
-RUN set -ex; \
-        apt-get update; \
-        apt-get install -y --no-install-recommends \
-                python-is-python3 \
-        ; \
-        rm -rf /var/lib/apt/lists/*
+# Copy code
+COPY . /bot/
+RUN dart pub get --offline
 
-RUN npm install --production
+# Compile bot into executable
+RUN dart run nyxx_commands:compile --compile -o crunchy-bot.g.dart --no-compile bin/crunchy-bot.dart
+RUN dart compile exe -o crunchy-bot crunchy-bot.g.dart
 
-COPY . .
-
-CMD [ "node", "index.js" ]
+CMD [ "./crunchy-bot" ]
